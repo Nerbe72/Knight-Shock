@@ -1,0 +1,36 @@
+{
+    "characters": [
+        {
+            "Id": 10001,
+            "BaseRare": 2,
+            "Name": "아멜리아",
+            "BaseClass": 0,
+            "BaseHp": 400,
+            "BaseMelee": 120,
+            "BaseMagic": 350,
+            "BaseMeleeDefense": 140,
+            "BaseMagicDefense": 180,
+            "SkillId": [
+                1001,
+                1002
+            ],
+            "PassiveId": []
+        },
+        {
+            "Id": 10002,
+            "BaseRare": 1,
+            "Name": "키리",
+            "BaseClass": 0,
+            "BaseHp": 550,
+            "BaseMelee": 330,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 210,
+            "BaseMagicDefense": 210,
+            "SkillId": [],
+            "PassiveId": [
+                2001,
+                2002
+            ]
+        }
+    ]
+}

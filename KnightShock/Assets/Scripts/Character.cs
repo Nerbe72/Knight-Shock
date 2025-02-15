@@ -1,0 +1,39 @@
+using System;
+using System.Collections.Generic;
+
+[Serializable]
+public class Character
+{
+    public int Id;
+    public Rare BaseRare;
+    public string Name;
+    public ClassType BaseClass;
+    public int BaseHp;
+    public int BaseMelee;
+    public int BaseMagic;
+    public int BaseMeleeDefense;
+    public int BaseMagicDefense;
+    public List<int> SkillId;
+    public List<int> PassiveId;
+
+    public Character()
+    {
+        Id = 10000;
+        BaseRare = Rare.R;
+        Name = "";
+        BaseClass = ClassType.Attacker;
+        BaseHp = 1;
+        BaseMelee = 0;
+        BaseMagic = 0;
+        BaseMeleeDefense = 0;
+        BaseMagicDefense = 0;
+        SkillId = new List<int>();
+        PassiveId = new List<int>();
+    }
+}
+
+[Serializable]
+public class CharacterWrapper
+{
+    public List<Character> characters;
+}

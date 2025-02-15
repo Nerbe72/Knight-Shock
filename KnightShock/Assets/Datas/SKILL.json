@@ -1,0 +1,32 @@
+{
+    "skills": [
+        {
+            "Id": 1001,
+            "Type": 2,
+            "Description": "팀의 공포 수치를 소폭 감소시킨다.",
+            "ChangeEmotions": [
+                {
+                    "EmotionType": 8102,
+                    "IsPercent": false,
+                    "Amount": -8.0
+                }
+            ],
+            "ChangeStats": [],
+            "Attacks": []
+        },
+        {
+            "Id": 1002,
+            "Type": 0,
+            "Description": "출전중인 아군의 공격력을 10% 증가시킨다",
+            "ChangeEmotions": [],
+            "ChangeStats": [
+                {
+                    "StatType": 8201,
+                    "IsPercent": true,
+                    "Amount": 10.0
+                }
+            ],
+            "Attacks": []
+        }
+    ]
+}
