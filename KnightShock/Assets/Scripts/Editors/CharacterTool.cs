@@ -91,6 +91,7 @@ public class CharacterTool : EditorWindow
 
             ch.Id = EditorGUILayout.IntField("캐릭터ID", ch.Id);
             ch.Name = EditorGUILayout.TextField("이름", ch.Name);
+            ch.standingPath = EditorGUILayout.TextField("이미지 경로", ch.standingPath);
             ch.BaseRare = (Rare)EditorGUILayout.EnumFlagsField("레어도", ch.BaseRare);
             ch.BaseHp = EditorGUILayout.IntField("체력", ch.BaseHp);
             ch.BaseMelee = EditorGUILayout.IntField("물리 공격력", ch.BaseMelee);

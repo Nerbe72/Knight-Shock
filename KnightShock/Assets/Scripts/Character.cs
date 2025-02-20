@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class Character
 {
     public int Id;
     public Rare BaseRare;
+    public string standingPath;
     public string Name;
     public ClassType BaseClass;
     public int BaseHp;
