@@ -42,9 +42,16 @@ public enum SkillType
     Active,
 }
 
-public enum AttackFixType
+public enum AttackType
 {
     None = 0,
     Melee,
     Magic
+}
+
+public enum AttackArea
+{
+    None,
+    Single,
+    Area,
 }

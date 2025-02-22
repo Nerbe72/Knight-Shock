@@ -2,21 +2,45 @@
     "characters": [
         {
             "Id": 10001,
-            "BaseRare": 0,
-            "standingPath": "A",
-            "Name": "A",
+            "BaseRare": 1,
+            "Name": "기사",
             "BaseClass": 0,
-            "BaseHp": 100,
-            "BaseMelee": 200,
+            "BaseHp": 320,
+            "BaseMelee": 210,
             "BaseMagic": 100,
-            "BaseMeleeDefense": 120,
-            "BaseMagicDefense": 120,
+            "BaseMeleeDefense": 250,
+            "BaseMagicDefense": 180,
             "SkillId": [
                 2001
             ],
             "PassiveId": [
                 1001
-            ]
+            ],
+            "CharacterSprite": {
+                "instanceID": 42930
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_10001.png"
+        },
+        {
+            "Id": 10002,
+            "BaseRare": 2,
+            "Name": "마법사",
+            "BaseClass": 0,
+            "BaseHp": 240,
+            "BaseMelee": 80,
+            "BaseMagic": 300,
+            "BaseMeleeDefense": 110,
+            "BaseMagicDefense": 160,
+            "SkillId": [
+                2002
+            ],
+            "PassiveId": [
+                1002
+            ],
+            "CharacterSprite": {
+                "instanceID": 42932
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_10002.png"
         }
     ]
 }

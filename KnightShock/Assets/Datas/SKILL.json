@@ -3,7 +3,7 @@
         {
             "Id": 1001,
             "Type": 1,
-            "Description": "팀의 공포 수치를 소폭 감소시킨다.",
+            "Description": "전투 진입시 팀의 공포 수치를 소폭 감소시킨다.",
             "ChangeEmotions": [
                 {
                     "EmotionType": 8102,
@@ -11,7 +11,13 @@
                     "Amount": -8.0
                 }
             ],
-            "ChangeStats": [],
+            "ChangeStats": [
+                {
+                    "StatType": 8200,
+                    "IsPercent": false,
+                    "Amount": 0.0
+                }
+            ],
             "Attacks": []
         },
         {
@@ -27,6 +33,36 @@
                 }
             ],
             "Attacks": []
+        },
+        {
+            "Id": 1002,
+            "Type": 1,
+            "Description": "전투 진입시 아군 전체의 마법 공격력을 10% 증가시킨다.",
+            "ChangeEmotions": [],
+            "ChangeStats": [
+                {
+                    "StatType": 8202,
+                    "IsPercent": true,
+                    "Amount": 5.0
+                }
+            ],
+            "Attacks": []
+        },
+        {
+            "Id": 2002,
+            "Type": 2,
+            "Description": "적에게 자신의 마법 공격력의 200%의 피해를 입힌다.",
+            "ChangeEmotions": [],
+            "ChangeStats": [],
+            "Attacks": [
+                {
+                    "AttackType": 2,
+                    "AttackArea": 1,
+                    "IsPercent": true,
+                    "IsFixedDamage": false,
+                    "Amount": 200.0
+                }
+            ]
         }
     ]
 }

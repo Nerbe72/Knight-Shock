@@ -7,7 +7,6 @@ public class Character
 {
     public int Id;
     public Rare BaseRare;
-    public string standingPath;
     public string Name;
     public ClassType BaseClass;
     public int BaseHp;
@@ -17,6 +16,8 @@ public class Character
     public int BaseMagicDefense;
     public List<int> SkillId;
     public List<int> PassiveId;
+    public Sprite CharacterSprite;
+    public string SpritePath;
 
     public Character()
     {
@@ -31,6 +32,8 @@ public class Character
         BaseMagicDefense = 0;
         SkillId = new List<int>();
         PassiveId = new List<int>();
+        CharacterSprite = null;
+        SpritePath = "";
     }
 }
 

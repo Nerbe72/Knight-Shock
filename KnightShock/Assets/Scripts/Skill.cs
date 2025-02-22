@@ -20,6 +20,7 @@ public class Skill
         Description = "";
         ChangeEmotions = new List<ChangeEmotion>();
         ChangeStats = new List<ChangeStat>();
+        Attacks = new List<AttackSkill>();
     }
 }
 
@@ -59,14 +60,16 @@ public class AttackSkill
     /// <summary>
     /// 공격 보정 타입
     /// </summary>
-    public AttackFixType FixType;
+    public AttackType AttackType;
+    public AttackArea AttackArea;
     public bool IsPercent;
     public bool IsFixedDamage;
     public float Amount;
 
     public AttackSkill()
     {
-        FixType = AttackFixType.None;
+        AttackType = AttackType.None;
+        AttackArea = AttackArea.None;
         IsPercent = false;
         IsFixedDamage = false;
         Amount = 0;

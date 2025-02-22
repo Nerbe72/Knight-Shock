@@ -91,7 +91,7 @@ public class CharacterTool : EditorWindow
 
             ch.Id = EditorGUILayout.IntField("캐릭터ID", ch.Id);
             ch.Name = EditorGUILayout.TextField("이름", ch.Name);
-            ch.standingPath = EditorGUILayout.TextField("이미지 경로", ch.standingPath);
+            ch.SpritePath = EditorGUILayout.TextField("이미지 경로", ch.SpritePath);
             ch.BaseRare = (Rare)EditorGUILayout.EnumFlagsField("레어도", ch.BaseRare);
             ch.BaseHp = EditorGUILayout.IntField("체력", ch.BaseHp);
             ch.BaseMelee = EditorGUILayout.IntField("물리 공격력", ch.BaseMelee);
@@ -122,6 +122,29 @@ public class CharacterTool : EditorWindow
                 ch.SkillId[index] = EditorGUI.IntField(rect, ch.SkillId[index]);
             };
             reorderActive.DoLayoutList();
+
+            if (ch.SpritePath != null)
+            {
+                ch.CharacterSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SpritePath);
+            }
+
+            ch.CharacterSprite = (Sprite)EditorGUILayout.ObjectField("스탠딩", ch.CharacterSprite, typeof(Sprite), false);
+            if (ch.CharacterSprite != null)
+            {
+                int size = 30;
+                Rect previewRect = GUILayoutUtility.GetRect(size * 9, size * 16);
+                previewRect.width = size * 9;
+                previewRect.height = size * 16;
+                Rect spriteRect = ch.CharacterSprite.textureRect;
+                Rect normalizedRect = new Rect(
+                    spriteRect.x / ch.CharacterSprite.texture.width,
+                    spriteRect.y / ch.CharacterSprite.texture.height,
+                    spriteRect.width / ch.CharacterSprite.texture.width,
+                    spriteRect.height / ch.CharacterSprite.texture.height
+                    );
+                GUI.DrawTextureWithTexCoords(previewRect, ch.CharacterSprite.texture, normalizedRect, true);
+                ch.SpritePath = AssetDatabase.GetAssetPath(ch.CharacterSprite);
+            }
 
             // 삭제 버튼
             EditorGUILayout.BeginHorizontal(); // (5)
@@ -214,11 +237,23 @@ public class CharacterTool : EditorWindow
                 var sk = skillList[i];
 
                 sk.Id = EditorGUILayout.IntField("스킬 ID", sk.Id);
+                if ((int)(sk.Id / 1000) == 1)
+                {
+                    sk.Type = SkillType.Passive;
+                } else if ((int)(sk.Id / 1000) == 2)
+                {
+                    sk.Type = SkillType.Active;
+                } else
+                {
+                    sk.Type = SkillType.None;
+                }
+
                 sk.Type = (SkillType)EditorGUILayout.EnumFlagsField("타입", sk.Type);
+
                 EditorGUILayout.LabelField("설명");
                 sk.Description = EditorGUILayout.TextArea(sk.Description, GUILayout.Height(150));
 
-                //감정
+                //감정 변경
                 ReorderableList reorderEmotion = new ReorderableList(sk.ChangeEmotions, typeof(int), true, true, true, true);
                 reorderEmotion.elementHeight = EditorGUIUtility.singleLineHeight * 4 + 16f;
                 reorderEmotion.drawHeaderCallback = (Rect rect) =>
@@ -246,6 +281,7 @@ public class CharacterTool : EditorWindow
                 };
                 reorderEmotion.DoLayoutList();
 
+                //스탯 변경
                 ReorderableList reorderStatus = new ReorderableList(sk.ChangeStats, typeof(int), true, true, true, true);
                 reorderStatus.elementHeight = EditorGUIUtility.singleLineHeight * 4 + 16f;
                 reorderStatus.drawHeaderCallback = (Rect rect) =>
@@ -272,6 +308,45 @@ public class CharacterTool : EditorWindow
                     EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 4, rect.width, 1), Color.gray);
                 };
                 reorderStatus.DoLayoutList();
+
+                //공격 스킬
+                ReorderableList reorderAttack = new ReorderableList(sk.Attacks, typeof(int), true, true, true, true);
+                reorderAttack.elementHeight = EditorGUIUtility.singleLineHeight * 6 + 16f;
+                reorderAttack.drawHeaderCallback = (Rect rect) =>
+                {
+                    EditorGUI.LabelField(rect, "공격");
+                };
+                reorderAttack.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+                {
+                    var item = sk.Attacks[index];
+
+                    //공격 보정타입
+                    var lineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
+                    item.AttackType = (AttackType)EditorGUI.EnumPopup(lineRect, "공격 보정", item.AttackType);
+
+                    //공격 범위
+                    var lineRect2 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 2f),
+                                                rect.width, EditorGUIUtility.singleLineHeight);
+                    item.AttackArea = (AttackArea)EditorGUI.EnumPopup(lineRect2, "공격 범위", item.AttackArea);
+
+                    //퍼센트 여부
+                    var lineRect3 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 3f),
+                                                rect.width, EditorGUIUtility.singleLineHeight);
+                    item.IsPercent = EditorGUI.Toggle(lineRect3, "퍼센트 여부", item.IsPercent);
+
+                    //고정 데미지 여부
+                    var lineRect4 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 4f),
+                                                rect.width, EditorGUIUtility.singleLineHeight);
+                    item.IsFixedDamage = EditorGUI.Toggle(lineRect4, "고정 데미지 여부", item.IsFixedDamage);
+
+                    //증감
+                    var lineRect5 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 5f),
+                                                rect.width, EditorGUIUtility.singleLineHeight);
+                    item.Amount = EditorGUI.FloatField(lineRect5, "증감", item.Amount);
+
+                    EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 4, rect.width, 1), Color.gray);
+                };
+                reorderAttack.DoLayoutList();
 
                 // 삭제 버튼
                 EditorGUILayout.BeginHorizontal(); // (9)
