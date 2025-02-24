@@ -55,3 +55,10 @@ public enum AttackArea
     Single,
     Area,
 }
+
+public enum Request
+{
+    characters,
+    money,
+    items,
+}

@@ -35,6 +35,21 @@ public class Character
         CharacterSprite = null;
         SpritePath = "";
     }
+
+    public override bool Equals(object obj)
+    {
+        if (ReferenceEquals(this, obj)) return true;
+
+        if (obj == null) return false;
+
+        Character other = obj as Character;
+        return Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
 }
 
 [Serializable]
