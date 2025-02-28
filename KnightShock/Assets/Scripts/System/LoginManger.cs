@@ -9,9 +9,9 @@ public class LoginManger : MonoBehaviour
 {
     private const string loginUrl = "http://localhost:3000/login";
 
-    public async static Task LoginAsync(string _username, string _password)
+    public async static Task LoginAsync(string _id, string _password)
     {
-        LoginRequestData data = new LoginRequestData { username = _username, password = _password };
+        LoginRequestData data = new LoginRequestData { id = _id, password = _password };
         string jsonData = JsonUtility.ToJson(data);
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(jsonData);
 
@@ -45,7 +45,8 @@ public class LoginManger : MonoBehaviour
             else
             {
                 Debug.Log("<color=green>로그인 완료!</color>");
-                GameManager.Instance.SetUID(answerData.userId);
+                GameManager.Instance.SetUID(answerData.uid);
+                GameManager.Instance.SetUserName(answerData.username);
                 AuthManager.Instance.SetToken(answerData.token);
                 SceneManager.LoadScene("Lobby");
             }
@@ -55,7 +56,7 @@ public class LoginManger : MonoBehaviour
     [Serializable]
     public class LoginRequestData
     {
-        public string username;
+        public string id;
         public string password;
     }
 
@@ -64,6 +65,7 @@ public class LoginManger : MonoBehaviour
     {
         public bool success;
         public string token;
-        public int userId;
+        public int uid;
+        public string username;
     }
 }

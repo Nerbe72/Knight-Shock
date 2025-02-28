@@ -2,7 +2,7 @@
     "characters": [
         {
             "Id": 10001,
-            "BaseRare": 1,
+            "BaseRare": 2,
             "Name": "기사",
             "BaseClass": 0,
             "BaseHp": 320,
@@ -17,7 +17,7 @@
                 1001
             ],
             "CharacterSprite": {
-                "instanceID": 42930
+                "instanceID": 53288
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STAND_10001.png"
         },
@@ -38,7 +38,7 @@
                 1002
             ],
             "CharacterSprite": {
-                "instanceID": 42932
+                "instanceID": 53270
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STAND_10002.png"
         }

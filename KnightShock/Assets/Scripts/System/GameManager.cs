@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
     public static string DefaultImagePath = Path.Combine(Application.dataPath, "Resources", "STANDING");
 
     public int UID { get; private set; }
+    public string UserName { get; private set; }
 
     private void Awake()
     {
@@ -22,11 +23,18 @@ public class GameManager : MonoBehaviour
         }
 
         UID = -1;
+        UserName = "";
     }
 
     public void SetUID(int _id)
     {
-        Debug.LogWarning($"플레이어 ID가 수정되었습니다 {UID} -> {_id}");
+        Debug.LogWarning($"플레이어 ID가 수정되었습니다 <color=green>{UID} -> {_id}</color>");
         UID = _id;
+    }
+
+    public void SetUserName(string _name)
+    {
+        Debug.LogWarning($"플레이어 ID가 수정되었습니다 <color=green>{UserName} -> {_name}</color>");
+        UserName = _name;
     }
 }

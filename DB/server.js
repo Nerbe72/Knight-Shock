@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 // 로그인 엔드포인트 (변경된 반환 정보)
 app.post('/login', (req, res) => {
-  const { username, password } = req.body;
+  const { id, password } = req.body;
   
   // db.json 파일에서 사용자 정보 읽어오기
   fs.readFile('./db.json', 'utf8', (err, data) => {
@@ -22,20 +22,21 @@ app.post('/login', (req, res) => {
     }
     
     const users = JSON.parse(data).users;
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u => u.id === id && u.password === password);
     
     if (!user) {
       return res.status(401).json({ success: false, message: '아이디 혹은 비밀번호가 틀렸습니다.' });
     }
     
     // 로그인 성공 시 JWT 토큰 발급 (토큰에 userId 포함)
-    const token = jwt.sign({ userId: user.id }, secretKey, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user.uid }, secretKey, { expiresIn: '1h' });
     
     // 반환 정보: success, token, userId
     return res.json({
       success: true,
       token: token,
-      userId: user.id
+      uid: user.uid,
+      username: user.username
     });
   });
 });
@@ -61,7 +62,7 @@ function verifyToken(req, res, next) {
 
 // 캐릭터 소지 목록 반환 API (보호된 엔드포인트, POST 요청)
 app.post('/characters', verifyToken, (req, res) => {
-  fs.readFile('./character.json', 'utf8', (err, data) => {
+  fs.readFile('./characters.json', 'utf8', (err, data) => {
     if (err) {
       return res.status(500).json({ message: '서버 에러' });
     }
@@ -136,6 +137,28 @@ app.post('/updateCharacters', verifyToken, (req, res) => {
     });
   });
 });
+
+// 현재 시행중인 가챠 배너 제공
+app.post('/banners', verifyToken, (req, res) => {
+    fs.readFile('./banners.json', 'utf8', (err, data) => {
+        if (err) {
+            return res.status(500).json({ message: '서버 에러' });
+        }
+
+        let bannersData;
+        try {
+            bannersData = JSON.parse(data).banners;
+        } catch (e) {
+            return res.status(500).json({ message: '데이터 파싱 에러' });
+        }
+
+        return res.json({
+            banners: bannersData
+        });
+    });
+});
+
+
 
 app.listen(port, () => {
   console.log(`서버가 포트 ${port}에서 실행 중입니다.`);

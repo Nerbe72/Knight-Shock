@@ -56,9 +56,21 @@ public enum AttackArea
     Area,
 }
 
+/// <summary>
+/// DB호출 타입과 일치하도록 설정 (server.js 참고)
+/// </summary>
 public enum Request
 {
     characters,
     money,
     items,
+    banners,
+}
+
+public enum BannerType
+{
+    None,
+    Beginner,
+    Pickup,
+    Limited,
 }
