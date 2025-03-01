@@ -86,7 +86,12 @@ public class GachaUI : MonoBehaviour
                 characterIMG[i].sprite = CharacterManager.GetCharacter(_container.Data.SSR_PickupList[i]).CharacterSprite;
                 Debug.Log(CharacterManager.GetCharacter(_container.Data.SSR_PickupList[i]).Id);
             }
-            catch (IndexOutOfRangeException) { break; }
+            catch (ArgumentOutOfRangeException) { break; }
         }
+    }
+
+    private void ResetContent()
+    {
+
     }
 }
