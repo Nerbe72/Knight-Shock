@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -10,6 +11,18 @@ public class GachaMangaer : MonoBehaviour
 {
     public static GachaMangaer Instance;
     public List<BannerData> bannerDatas { get; private set; }
+
+    public List<int> roll_history { get; private set; }
+    public List<int> roll_result { get; private set; }
+
+    [Serializable]
+    public class GachaCharacter
+    {
+        public string Name;
+        public Rare Rarity;
+        public bool IsPickup;
+        public float BaseProbability;
+    }
 
     private void Awake()
     {
@@ -24,30 +37,168 @@ public class GachaMangaer : MonoBehaviour
         }
 
         bannerDatas = new List<BannerData>();
+        roll_history = new List<int>();
     }
+
+
+    [SerializeField] private List<GachaCharacter> gacha_SSR_Pool;
+    [SerializeField] private List<GachaCharacter> gacha_SR_Pool;
+    [SerializeField] private List<GachaCharacter> gacha_R_Pool;
+    [SerializeField] private int srPity = 10;
+    [SerializeField] private int ssrHalfAdventageStartCut = 40; //확업 시작
+    [SerializeField] private int ssrHalfPity = 60; //ssr천장수치
+    [SerializeField] private bool isSSRFullPity = false; //픽업 천장인지
+    [SerializeField] private float ssrProbabilityIncrease = 1.5f;
 
     /// <summary>
     /// 가챠 확률 계산
     /// </summary>
     /// <returns>결과(캐릭터id) 반환</returns>
-    public int StartGacha()
+    public void StartGacha(BannerContainer _container, int _count = 1)
     {
-        //랜덤 년도, 월, 일, 시간, 틱, 밀리초
-        int seed = (int)System.DateTime.Now.Ticks + Random.Range(0, System.DateTime.Now.Year) + System.DateTime.Now.Month + System.DateTime.Now.Day + System.DateTime.Now.Hour + System.DateTime.Now.Minute + System.DateTime.Now.Millisecond;
-        Random.InitState(seed);
+        // 가챠 결과를 저장할 리스트입니다.
+        List<int> results = new List<int>();
 
-        int random = Random.Range(0, 101);
-        //R
-        Rare selectedRare = Rare.R;
-        if (random > 80 && random <= 99) selectedRare = Rare.SR;
-        if (random > 99) selectedRare = Rare.SSR;
+        // 뽑기 상태는 해당 호출 내에서만 관리합니다.
+        int currentSSRCount = 0;   // 마지막 SSR 등장 이후 누적 뽑기 수
+        int currentSRCount = 0;    // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
+        bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
 
-        int inner = Random.Range(0, CharacterManager.GetRareCharacterCount(selectedRare));
+        for (int i = 0; i < _count; i++)
+        {
+            // 각 뽑기마다 pity 카운터 증가
+            currentSSRCount++;
+            currentSRCount++;
 
-        int selectedId = CharacterManager.GetRandomCharacter(selectedRare, inner);
+            // 강제 천장 조건
+            bool forcedSSR = (currentSSRCount >= 60);
+            bool forcedSR = (currentSRCount >= 10);
 
-        return selectedId;
+            // 만약 두 천장이 동시에 발동하면 SR이 우선 적용됩니다.
+            if (forcedSSR && forcedSR)
+            {
+                int srResult = DrawSR(_container);
+                results.Add(srResult);
+                currentSRCount = 0;  // SR pity는 초기화
+                                     // SSR pity는 그대로 유지되어 다음 뽑기에 반영됩니다.
+                continue;
+            }
+
+            // SR 천장 우선 처리
+            if (forcedSR)
+            {
+                int srResult = DrawSR(_container);
+                results.Add(srResult);
+                currentSRCount = 0;
+                continue;
+            }
+
+            // SSR 천장 처리
+            if (forcedSSR)
+            {
+                int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
+                results.Add(ssrResult);
+                currentSSRCount = 0;
+                currentSRCount = 0;
+                continue;
+            }
+
+            // 일반 뽑기: 기본 SSR 확률에 40회 이상부터 추가 확률이 누적됩니다.
+            float effectiveSSRChance = _container.Data.SSR_Percent;
+            if (currentSSRCount >= 40)
+            {
+                effectiveSSRChance += (currentSSRCount - 39) * 1.5f;
+            }
+
+            // SSR 판정
+            float roll = UnityEngine.Random.Range(0f, 100f);
+            if (roll < effectiveSSRChance)
+            {
+                int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
+                results.Add(ssrResult);
+                currentSSRCount = 0;
+                currentSRCount = 0;
+            }
+            else
+            {
+                // SSR 실패 시 SR 판정
+                float srRoll = UnityEngine.Random.Range(0f, 100f);
+                if (srRoll < _container.Data.SR_Percent)
+                {
+                    int srResult = DrawSR(_container);
+                    results.Add(srResult);
+                    currentSRCount = 0;
+                }
+                else
+                {
+                    // 나머지는 R 등급 처리 (여기서는 기본값 0 사용)
+                    results.Add(0);
+                }
+            }
+        }
+
+        // 결과 출력 (디버그 로그)
+        for (int i = 0; i < results.Count; i++)
+        {
+            Debug.Log(string.Format("뽑기 결과 {0}: {1}", i + 1, results[i]));
+        }
     }
+
+    /// <summary>
+    /// SSR 결과를 결정합니다.
+    /// forcePickupSSR 플래그가 활성화되어 있다면 무조건 픽업 SSR을 선택하며,
+    /// 그렇지 않을 경우 50% 확률로 픽업 SSR, 아닐 경우 다음 SSR은 무조건 픽업 SSR이 되도록 합니다.
+    /// </summary>
+    private int GetSSRResult(ref bool forcePickupSSR, BannerContainer _container)
+    {
+        if (forcePickupSSR)
+        {
+            int result = PickFromList(_container.Data.SSR_PickupList, -1);
+            forcePickupSSR = false;
+            return result;
+        }
+        else
+        {
+            float pickupRoll = UnityEngine.Random.Range(0f, 100f);
+            if (pickupRoll < 50f)
+            {
+                return PickFromList(_container.Data.SSR_PickupList, -1);
+            }
+            else
+            {
+                // 픽업이 아닌 경우 다음 SSR은 무조건 픽업 SSR이 되도록 플래그 설정
+                forcePickupSSR = true;
+                return PickFromList(_container.Data.SSR_PickupList, -1);
+            }
+        }
+    }
+
+    /// <summary>
+    /// SR 결과를 결정합니다.
+    /// SR 픽업 리스트가 있다면 무작위 선택, 없으면 기본값(-2) 반환.
+    /// </summary>
+    private int DrawSR(BannerContainer _container)
+    {
+        return PickFromList(_container.Data.SR_PickupList, -2);
+    }
+
+    /// <summary>
+    /// 주어진 리스트에서 무작위로 아이템을 선택합니다.
+    /// 리스트가 비어있을 경우 defaultValue를 반환합니다.
+    /// </summary>
+    private int PickFromList(List<int> list, int defaultValue)
+    {
+        if (list != null && list.Count > 0)
+        {
+            int idx = UnityEngine.Random.Range(0, list.Count);
+            return list[idx];
+        }
+        return defaultValue;
+    }
+
+
+    /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     public async Task InitBannerDatas()
     {

@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
 
     public void SetUserName(string _name)
     {
-        Debug.LogWarning($"플레이어 ID가 수정되었습니다 <color=green>{UserName} -> {_name}</color>");
+        Debug.LogWarning($"플레이어 이름이 수정되었습니다 <color=green>{UserName} -> {_name}</color>");
         UserName = _name;
     }
 }

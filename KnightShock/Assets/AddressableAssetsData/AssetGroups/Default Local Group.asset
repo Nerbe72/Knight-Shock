@@ -15,11 +15,29 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 71c11753b8d1f4049ae32eccbca4febe
   m_SerializeEntries:
-  - m_GUID: 0bf94ce904b47e347aae99d7cb1fa793
-    m_Address: BANNERS/wizard_banner
+  - m_GUID: 5af9965f3b131d54fa7dc6d1a5890e66
+    m_Address: BANNERS/cecilia_banner
     m_ReadOnly: 0
     m_SerializedLabels:
     - banners
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c5e1242e56021d4b9af69f3cb4559dc
+    m_Address: BANNERBGS/regular_bg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - bg
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c9f7aec792e7c64c9bf2c1a86fb0014
+    m_Address: BANNERS/regular_banner
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - banners
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fbd41c99eeb6fc24ba0189a01fee7c4b
+    m_Address: BANNERBGS/cecilia_bg
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - bg
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 711b1e8ab05deba499552edea59206cf, type: 2}

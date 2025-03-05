@@ -22,6 +22,7 @@ public class LobbyUI : MonoBehaviour
     private void Start()
     {
         InitUI();
+        CharacterManager.LoadCharacters();
     }
 
     private void OnDestroy()

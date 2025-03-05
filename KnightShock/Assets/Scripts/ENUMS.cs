@@ -30,9 +30,9 @@ public enum ClassType
 
 public enum Rare
 {
-    R,
-    SR,
-    SSR,
+    R = 3,
+    SR = 2,
+    SSR = 1,
 }
 
 public enum SkillType

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,6 +14,9 @@ public class GachaUI : MonoBehaviour
     [SerializeField] private RectTransform characterPosition;
     [SerializeField] private List<Image> characterIMG;
 
+    [SerializeField] private Button one_roll;
+    [SerializeField] private Button ten_roll;
+
     private GachaMangaer gachaManager;
 
     private void OnEnable()
@@ -28,6 +30,9 @@ public class GachaUI : MonoBehaviour
         InitUI();
         await gachaManager.InitBannerDatas();
         SetUI();
+
+        GameObject button_first = gacha_scroll.content.GetChild(0).gameObject;
+        SelectContent(button_first.GetComponent<BannerContainer>());
     }
 
     private void InitUI()
@@ -74,24 +79,34 @@ public class GachaUI : MonoBehaviour
 
     private async void SelectContent(BannerContainer _container)
     {
+        one_roll.onClick.RemoveAllListeners();
+        ten_roll.onClick.RemoveAllListeners();
+
         backgroundIMG.sprite = await gachaManager.LoadSprite(_container.Data.backgroundPath);
         bannerText.text = _container.Data.bannerName;
         characterPosition.position.Set(_container.Data.characterPosition.x, _container.Data.characterPosition.y, 0);
 
-        int count = characterIMG.Count;
+        //픽업이 3 이상인 경우 3명까지만 표시
+        int count = Math.Clamp(_container.Data.SSR_PickupList.Count, 0, 3);
         for (int i = 0; i < count; i++)
         {
-            try
-            {
-                characterIMG[i].sprite = CharacterManager.GetCharacter(_container.Data.SSR_PickupList[i]).CharacterSprite;
-                Debug.Log(CharacterManager.GetCharacter(_container.Data.SSR_PickupList[i]).Id);
-            }
-            catch (ArgumentOutOfRangeException) { break; }
+            characterIMG[i].sprite = CharacterManager.GetCharacterFromID(_container.Data.SSR_PickupList[i]).CharacterSprite;
+            characterIMG[i].color = Color.white;
         }
-    }
 
-    private void ResetContent()
-    {
+        for (int i = count; i < 3; i++)
+        {
+            characterIMG[i].color = Color.clear;
+        }
 
+        one_roll.onClick.AddListener(() => 
+        {
+            GachaMangaer.Instance.StartGacha(_container);
+        });
+
+        ten_roll.onClick.AddListener(() =>
+        {
+            GachaMangaer.Instance.StartGacha(_container, 10);
+        });
     }
 }

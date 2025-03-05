@@ -43,7 +43,7 @@ public class Character
         if (obj == null) return false;
 
         Character other = obj as Character;
-        return Equals(other);
+        return other.Id == this.Id;
     }
 
     public override int GetHashCode()

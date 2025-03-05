@@ -2,14 +2,14 @@
   "banners": [
     {
       "bannerType": "Pickup",
-      "bannerName": "불을 조율하는 바람",
+      "bannerName": "황금의 수호자",
       "SSR_PickupList": [10001],
-      "SR_PickupList": [9001, 9002, 9003],
+      "SR_PickupList": [20001, 20003],
       "SSR_Percent": 1,
       "SR_Percent": 19,
       "SSR_PickupPercent": 50,
-      "bannerPath": "BANNERS/wizard_banner",
-      "backgroundPath": "BANNERBGS/wizard_bg",
+      "bannerPath": "BANNERS/cecilia_banner",
+      "backgroundPath": "BANNERBGS/cecilia_bg",
       "characterPosition": { "x": 0, "y": 0 },
       "singlePrice": 1,
       "tenPrice": 10
@@ -17,13 +17,13 @@
     {
       "bannerType": "None",
       "bannerName": "일상의 선율",
-      "SSR_PickupList": [],
+      "SSR_PickupList": [10003, 10001, 10002],
       "SR_PickupList": [],
       "SSR_Percent": 1,
       "SR_Percent": 19,
       "SSR_PickupPercent": 0,
-      "bannerPath": "Assets/Resources/BANNERS/regular_banner.png",
-      "backgroundPath": "Assets/Resources/BANNERBGS/regular_bg.png",
+      "bannerPath": "BANNERS/regular_banner",
+      "backgroundPath": "BANNERBGS/regular_bg",
       "characterPosition": { "x": 0, "y": 0 },
       "singlePrice": 1,
       "tenPrice": 10

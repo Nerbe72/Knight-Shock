@@ -3,7 +3,7 @@
         {
             "Id": 10001,
             "BaseRare": 2,
-            "Name": "기사",
+            "Name": "세실리아",
             "BaseClass": 0,
             "BaseHp": 320,
             "BaseMelee": 210,
@@ -17,14 +17,14 @@
                 1001
             ],
             "CharacterSprite": {
-                "instanceID": 53288
+                "instanceID": 86458
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STAND_10001.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10001.png"
         },
         {
             "Id": 10002,
             "BaseRare": 2,
-            "Name": "마법사",
+            "Name": "루비",
             "BaseClass": 0,
             "BaseHp": 240,
             "BaseMelee": 80,
@@ -38,9 +38,145 @@
                 1002
             ],
             "CharacterSprite": {
+                "instanceID": 86448
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10002.png"
+        },
+        {
+            "Id": 10003,
+            "BaseRare": 2,
+            "Name": "유메",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 71100
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10003.png"
+        },
+        {
+            "Id": 20001,
+            "BaseRare": 1,
+            "Name": "마틸다",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 86234
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20001.png"
+        },
+        {
+            "Id": 20002,
+            "BaseRare": 1,
+            "Name": "에일린",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 86240
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20002.png"
+        },
+        {
+            "Id": 20003,
+            "BaseRare": 1,
+            "Name": "아쿠아",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 86246
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20003.png"
+        },
+        {
+            "Id": 30001,
+            "BaseRare": 0,
+            "Name": "릴리아",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
                 "instanceID": 53270
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STAND_10002.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30001.png"
+        },
+        {
+            "Id": 30002,
+            "BaseRare": 0,
+            "Name": "릴리안",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 53288
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30002.png"
+        },
+        {
+            "Id": 30003,
+            "BaseRare": 0,
+            "Name": "루비",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 86464
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30003.png"
+        },
+        {
+            "Id": 30004,
+            "BaseRare": 0,
+            "Name": "리비아",
+            "BaseClass": 0,
+            "BaseHp": 1,
+            "BaseMelee": 0,
+            "BaseMagic": 0,
+            "BaseMeleeDefense": 0,
+            "BaseMagicDefense": 0,
+            "SkillId": [],
+            "PassiveId": [],
+            "CharacterSprite": {
+                "instanceID": 86624
+            },
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30004.png"
         }
     ]
 }

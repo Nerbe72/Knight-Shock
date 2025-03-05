@@ -11,9 +11,7 @@ using UnityEditor.Experimental.GraphView;
 public class CharacterTool : EditorWindow
 {
     private List<Character> characterList = new List<Character>();
-    private List<Skill> skillList = new List<Skill>();
     private Vector2 scrollPos;
-    private Vector2 scrollPosSkill;
     private string dataPath = Path.Combine(Application.dataPath, "Datas");
 
     [MenuItem("Tools/Character Creator")]
@@ -24,7 +22,7 @@ public class CharacterTool : EditorWindow
 
     private void OnGUI()
     {
-        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(900)); // (1) 최외곽 Horizontal
+        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(1000)); // (1) 최외곽 Horizontal
         EditorGUILayout.Space(10);
 
         // 왼쪽 영역 (캐릭터)
@@ -32,20 +30,12 @@ public class CharacterTool : EditorWindow
 
         EditorGUILayout.Space(10);
 
-        // 오른쪽 영역 (스킬)
-        SkillSide();
-
-        EditorGUILayout.Space(5);
-
-        // 힌트 표시
-        HintSide();
-
         EditorGUILayout.EndHorizontal(); // (1)
     }
 
     private void CharacterSide()
     {
-        EditorGUILayout.BeginVertical(GUILayout.Width(400));   // (2) 왼쪽
+        EditorGUILayout.BeginVertical(GUILayout.Width(1000));   // (2) 왼쪽
 
         GUILayout.Label("캐릭터");
 
@@ -80,293 +70,145 @@ public class CharacterTool : EditorWindow
 
     private void CharacterScroll()
     {
-        scrollPos = EditorGUILayout.BeginScrollView(scrollPos); // (4)
+        scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+        bool deletionOccurred = false;
+
+        //리스트 정렬
+        characterList.Sort((a, b) => a.Id.CompareTo(b.Id));
 
         int count = characterList.Count;
-        for (int i = 0; i < count; i++)
+        // 3개씩
+        for (int i = 0; i < count; i += 3)
         {
-            EditorGUILayout.BeginVertical("box");  // 박스
+            EditorGUILayout.BeginHorizontal();
 
-            var ch = characterList[i];
+            for (int j = i; j < i + 3 && j < count; j++)
+            {
+                EditorGUILayout.BeginVertical("box", GUILayout.Width(320));
 
-            ch.Id = EditorGUILayout.IntField("캐릭터ID", ch.Id);
-            ch.Name = EditorGUILayout.TextField("이름", ch.Name);
-            ch.SpritePath = EditorGUILayout.TextField("이미지 경로", ch.SpritePath);
-            ch.BaseRare = (Rare)EditorGUILayout.EnumFlagsField("레어도", ch.BaseRare);
-            ch.BaseHp = EditorGUILayout.IntField("체력", ch.BaseHp);
-            ch.BaseMelee = EditorGUILayout.IntField("물리 공격력", ch.BaseMelee);
-            ch.BaseMagic = EditorGUILayout.IntField("마법 공격력", ch.BaseMagic);
-            ch.BaseMeleeDefense = EditorGUILayout.IntField("물리 방어력", ch.BaseMeleeDefense);
-            ch.BaseMagicDefense = EditorGUILayout.IntField("마법 방어력", ch.BaseMagicDefense);
+                Rect lineRect = GUILayoutUtility.GetRect(30 * 9, 5);
+                EditorGUI.DrawRect(new Rect(lineRect.x, lineRect.y + lineRect.height - 2, lineRect.width, 3), Color.green);
 
-            //패시브
-            ReorderableList reorderPassive = new ReorderableList(ch.PassiveId, typeof(int), true, true, true, true);
-            reorderPassive.drawHeaderCallback = (Rect rect) =>
-            {
-                EditorGUI.LabelField(rect, "패시브 스킬");
-            };
-            reorderPassive.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                ch.PassiveId[index] = EditorGUI.IntField(rect, ch.PassiveId[index]);
-            };
-            reorderPassive.DoLayoutList();
+                var ch = characterList[j];
 
-            //액티브
-            ReorderableList reorderActive = new ReorderableList(ch.SkillId, typeof(int), true, true, true, true);
-            reorderActive.drawHeaderCallback = (Rect rect) =>
-            {
-                EditorGUI.LabelField(rect, "액티브 스킬");
-            };
-            reorderActive.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
-            {
-                ch.SkillId[index] = EditorGUI.IntField(rect, ch.SkillId[index]);
-            };
-            reorderActive.DoLayoutList();
+                ch.Id = EditorGUILayout.IntField("캐릭터ID", ch.Id);
+                ch.Name = EditorGUILayout.TextField("이름", ch.Name);
+                ch.SpritePath = EditorGUILayout.TextField("이미지 경로", ch.SpritePath);
 
-            if (ch.SpritePath != null)
-            {
-                ch.CharacterSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SpritePath);
-            }
-
-            ch.CharacterSprite = (Sprite)EditorGUILayout.ObjectField("스탠딩", ch.CharacterSprite, typeof(Sprite), false);
-            if (ch.CharacterSprite != null)
-            {
-                int size = 30;
-                Rect previewRect = GUILayoutUtility.GetRect(size * 9, size * 16);
-                previewRect.width = size * 9;
-                previewRect.height = size * 16;
-                Rect spriteRect = ch.CharacterSprite.textureRect;
-                Rect normalizedRect = new Rect(
-                    spriteRect.x / ch.CharacterSprite.texture.width,
-                    spriteRect.y / ch.CharacterSprite.texture.height,
-                    spriteRect.width / ch.CharacterSprite.texture.width,
-                    spriteRect.height / ch.CharacterSprite.texture.height
-                    );
-                GUI.DrawTextureWithTexCoords(previewRect, ch.CharacterSprite.texture, normalizedRect, true);
-                ch.SpritePath = AssetDatabase.GetAssetPath(ch.CharacterSprite);
-            }
-
-            // 삭제 버튼
-            EditorGUILayout.BeginHorizontal(); // (5)
-            {
-                EditorGUILayout.Space(10);
-                if (GUILayout.Button("삭제"))
+                if ((int)(ch.Id / 10000) == 1)
                 {
-                    characterList.RemoveAt(i);
-                    EditorGUILayout.EndHorizontal();
-                    EditorGUILayout.EndVertical();
-                    break;
+                    ch.BaseRare = Rare.SSR;
                 }
-                EditorGUILayout.Space(10);
-            }
-            EditorGUILayout.EndHorizontal();   // (5)
-
-            EditorGUILayout.EndVertical(); // 박스 종료
-            GUILayout.Space(5);
-        }
-
-        EditorGUILayout.EndScrollView(); // (4)
-    }
-
-    private void SkillSide()
-    {
-        EditorGUILayout.BeginVertical(GUILayout.Width(450)); // (6) 오른쪽
-
-        GUILayout.Label("스킬");
-
-        EditorGUILayout.BeginHorizontal(); // (7)
-        {
-            if (GUILayout.Button("불러오기"))
-            {
-                ImportJsonSkill();
-            }
-            if (GUILayout.Button("내보내기"))
-            {
-                ExportJsonSkill();
-            }
-        }
-        EditorGUILayout.EndHorizontal(); // (7)
-
-        if (GUILayout.Button("새 스킬"))
-        {
-            var newSkill = new Skill();
-            skillList.Add(newSkill);
-        }
-
-        GUILayout.Space(10);
-
-        // 스킬 리스트 스크롤 영역
-        SkillScroll();
-
-        EditorGUILayout.EndVertical(); // (6)
-    }
-
-    private void HintSide()
-    {
-        EditorGUILayout.BeginVertical(GUILayout.Width(100)); // (x)
-
-        GUIStyle titleStyle = new GUIStyle(EditorStyles.label);
-        titleStyle.fontSize = 14;
-        titleStyle.fontStyle = FontStyle.Bold;
-
-        EditorGUILayout.LabelField("감정", titleStyle);
-        for (int i = (int)EmotionType.None + 1; i < (int)EmotionType.Count; i++)
-        {
-            EditorGUILayout.LabelField($"{((EmotionType)i).ToString()}");
-        }
-        EditorGUILayout.Space(15);
-
-        EditorGUILayout.LabelField("스탯", titleStyle);
-        for (int i = (int)StatType.None + 1; i < (int)StatType.Count; i++)
-        {
-            EditorGUILayout.LabelField($"{((StatType)i).ToString()}");
-        }
-
-        EditorGUILayout.EndVertical(); // (x)
-    }
-
-    private void SkillScroll()
-    {
-        scrollPosSkill = EditorGUILayout.BeginScrollView(scrollPosSkill); // (8)
-
-        int skillCount = skillList.Count;
-        for (int i = 0; i < skillCount; i++)
-        {
-            EditorGUILayout.BeginVertical("box");
-            {
-                var sk = skillList[i];
-
-                sk.Id = EditorGUILayout.IntField("스킬 ID", sk.Id);
-                if ((int)(sk.Id / 1000) == 1)
+                else if ((int)(ch.Id / 10000) == 2)
                 {
-                    sk.Type = SkillType.Passive;
-                } else if ((int)(sk.Id / 1000) == 2)
+                    ch.BaseRare = Rare.SR;
+                }
+                else if ((int)(ch.Id / 10000) == 3)
                 {
-                    sk.Type = SkillType.Active;
+                    ch.BaseRare = Rare.R;
                 } else
                 {
-                    sk.Type = SkillType.None;
+                    ch.BaseRare = Rare.R;
                 }
 
-                sk.Type = (SkillType)EditorGUILayout.EnumFlagsField("타입", sk.Type);
+                ch.BaseRare = (Rare)EditorGUILayout.EnumFlagsField("레어도", ch.BaseRare);
+                ch.BaseHp = EditorGUILayout.IntField("체력", ch.BaseHp);
+                ch.BaseMelee = EditorGUILayout.IntField("물리 공격력", ch.BaseMelee);
+                ch.BaseMagic = EditorGUILayout.IntField("마법 공격력", ch.BaseMagic);
+                ch.BaseMeleeDefense = EditorGUILayout.IntField("물리 방어력", ch.BaseMeleeDefense);
+                ch.BaseMagicDefense = EditorGUILayout.IntField("마법 방어력", ch.BaseMagicDefense);
 
-                EditorGUILayout.LabelField("설명");
-                sk.Description = EditorGUILayout.TextArea(sk.Description, GUILayout.Height(150));
-
-                //감정 변경
-                ReorderableList reorderEmotion = new ReorderableList(sk.ChangeEmotions, typeof(int), true, true, true, true);
-                reorderEmotion.elementHeight = EditorGUIUtility.singleLineHeight * 4 + 16f;
-                reorderEmotion.drawHeaderCallback = (Rect rect) =>
+                // 패시브 스킬 리스트
+                ReorderableList reorderPassive = new ReorderableList(ch.PassiveId, typeof(int), true, true, true, true);
+                reorderPassive.drawHeaderCallback = (Rect rect) =>
                 {
-                    EditorGUI.LabelField(rect, "감정 변경치");
+                    EditorGUI.LabelField(rect, "패시브 스킬");
                 };
-                reorderEmotion.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+                reorderPassive.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
                 {
-                    var item = sk.ChangeEmotions[index];
-
-                    var lineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-                    item.EmotionType = (EmotionType)EditorGUI.EnumPopup(lineRect, "감정", item.EmotionType);
-
-                    // 2) IsPercent (Toggle)
-                    var lineRect2 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 2f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.IsPercent = EditorGUI.Toggle(lineRect2, "퍼센트 여부", item.IsPercent);
-
-                    // 3) Amount (int)
-                    var lineRect3 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 3f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.Amount = EditorGUI.FloatField(lineRect3, "증감", item.Amount);
-
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 4, rect.width, 1), Color.gray);
+                    ch.PassiveId[index] = EditorGUI.IntField(rect, ch.PassiveId[index]);
                 };
-                reorderEmotion.DoLayoutList();
+                reorderPassive.DoLayoutList();
 
-                //스탯 변경
-                ReorderableList reorderStatus = new ReorderableList(sk.ChangeStats, typeof(int), true, true, true, true);
-                reorderStatus.elementHeight = EditorGUIUtility.singleLineHeight * 4 + 16f;
-                reorderStatus.drawHeaderCallback = (Rect rect) =>
+                // 액티브 스킬 리스트
+                ReorderableList reorderActive = new ReorderableList(ch.SkillId, typeof(int), true, true, true, true);
+                reorderActive.drawHeaderCallback = (Rect rect) =>
                 {
-                    EditorGUI.LabelField(rect, "스탯 변경치");
+                    EditorGUI.LabelField(rect, "액티브 스킬");
                 };
-                reorderStatus.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+                reorderActive.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
                 {
-                    var item = sk.ChangeStats[index];
-
-                    var lineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-                    item.StatType = (StatType)EditorGUI.EnumPopup(lineRect, "스탯", item.StatType);
-
-                    // 2) IsPercent (Toggle)
-                    var lineRect2 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 2f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.IsPercent = EditorGUI.Toggle(lineRect2, "퍼센트 여부", item.IsPercent);
-
-                    // 3) Amount (int)
-                    var lineRect3 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 3f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.Amount = EditorGUI.FloatField(lineRect3, "증감", item.Amount);
-
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 4, rect.width, 1), Color.gray);
+                    ch.SkillId[index] = EditorGUI.IntField(rect, ch.SkillId[index]);
                 };
-                reorderStatus.DoLayoutList();
+                reorderActive.DoLayoutList();
 
-                //공격 스킬
-                ReorderableList reorderAttack = new ReorderableList(sk.Attacks, typeof(int), true, true, true, true);
-                reorderAttack.elementHeight = EditorGUIUtility.singleLineHeight * 6 + 16f;
-                reorderAttack.drawHeaderCallback = (Rect rect) =>
+                // Sprite 처리
+                if (!string.IsNullOrEmpty(ch.SpritePath))
                 {
-                    EditorGUI.LabelField(rect, "공격");
-                };
-                reorderAttack.drawElementCallback = (Rect rect, int index, bool isActive, bool isFocused) =>
+                    ch.CharacterSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SpritePath);
+                }
+
+                ch.CharacterSprite = (Sprite)EditorGUILayout.ObjectField("스탠딩", ch.CharacterSprite, typeof(Sprite), false);
+                if (ch.CharacterSprite != null)
                 {
-                    var item = sk.Attacks[index];
+                    int size = 30;
+                    Rect previewRect = GUILayoutUtility.GetRect(size * 9, size * 18);
+                    float maxWidth = previewRect.width;
 
-                    //공격 보정타입
-                    var lineRect = new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight);
-                    item.AttackType = (AttackType)EditorGUI.EnumPopup(lineRect, "공격 보정", item.AttackType);
+                    Rect spriteRect = ch.CharacterSprite.textureRect;
+                    float aspectRatio = spriteRect.height / spriteRect.width;
 
-                    //공격 범위
-                    var lineRect2 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 2f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.AttackArea = (AttackArea)EditorGUI.EnumPopup(lineRect2, "공격 범위", item.AttackArea);
+                    // 최대 가로 길이에 맞춰 스프라이트의 실제 높이를 계산합니다.
+                    float spriteHeight = maxWidth * aspectRatio;
 
-                    //퍼센트 여부
-                    var lineRect3 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 3f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.IsPercent = EditorGUI.Toggle(lineRect3, "퍼센트 여부", item.IsPercent);
+                    // previewRect의 하단에 정렬되도록 drawingRect를 생성합니다.
+                    Rect drawingRect = new Rect(
+                        previewRect.x,
+                        previewRect.y + previewRect.height - spriteHeight,
+                        maxWidth,
+                        spriteHeight
+                    );
 
-                    //고정 데미지 여부
-                    var lineRect4 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 4f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.IsFixedDamage = EditorGUI.Toggle(lineRect4, "고정 데미지 여부", item.IsFixedDamage);
+                    Rect normalizedRect = new Rect(
+                        spriteRect.x / ch.CharacterSprite.texture.width,
+                        spriteRect.y / ch.CharacterSprite.texture.height,
+                        spriteRect.width / ch.CharacterSprite.texture.width,
+                        spriteRect.height / ch.CharacterSprite.texture.height
+                    );
 
-                    //증감
-                    var lineRect5 = new Rect(rect.x, rect.y + (EditorGUIUtility.singleLineHeight * 5f),
-                                                rect.width, EditorGUIUtility.singleLineHeight);
-                    item.Amount = EditorGUI.FloatField(lineRect5, "증감", item.Amount);
+                    GUI.DrawTextureWithTexCoords(drawingRect, ch.CharacterSprite.texture, normalizedRect, true);
+                    ch.SpritePath = AssetDatabase.GetAssetPath(ch.CharacterSprite);
 
-                    EditorGUI.DrawRect(new Rect(rect.x, rect.y + rect.height - 4, rect.width, 1), Color.gray);
-                };
-                reorderAttack.DoLayoutList();
+                }
 
                 // 삭제 버튼
-                EditorGUILayout.BeginHorizontal(); // (9)
-
+                EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.Space(10);
                 if (GUILayout.Button("삭제"))
                 {
-                    skillList.RemoveAt(i);
+                    characterList.RemoveAt(j);
+                    deletionOccurred = true;
                     EditorGUILayout.EndHorizontal();
                     EditorGUILayout.EndVertical();
                     break;
                 }
-                EditorGUILayout.Space(10);
+                EditorGUILayout.EndHorizontal();
 
-                EditorGUILayout.EndHorizontal(); // (9)
+                Rect lineRect2 = GUILayoutUtility.GetRect(30 * 9, 3);
+                EditorGUI.DrawRect(new Rect(lineRect2.x, lineRect2.y + lineRect2.height, lineRect2.width, 3), Color.red);
+
+                EditorGUILayout.EndVertical();
             }
-            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndHorizontal();
+
+            if (deletionOccurred)
+            {
+                // 삭제 발생 시 루프 종료 후 재렌더링
+                break;
+            }
             GUILayout.Space(5);
         }
-        EditorGUILayout.EndScrollView(); // (8)
+        EditorGUILayout.EndScrollView();
     }
 
     private void ImportJson()
@@ -393,35 +235,6 @@ public class CharacterTool : EditorWindow
         CharacterWrapper characterWrapper = new CharacterWrapper();
         characterWrapper.characters = characterList;
         string json = JsonUtility.ToJson(characterWrapper, true);
-        Debug.Log(json);
-
-        File.WriteAllText(path, json);
-    }
-
-    private void ImportJsonSkill()
-    {
-        string path = EditorUtility.OpenFilePanel("스킬 정보 열기", dataPath, "json");
-
-        if (string.IsNullOrEmpty(path)) return;
-
-        string json = File.ReadAllText(path);
-        SkillWrapper skillWrapper = JsonUtility.FromJson<SkillWrapper>(json);
-
-        if (skillWrapper != null && skillWrapper.skills != null)
-        {
-            skillList = skillWrapper.skills;
-        }
-    }
-
-    private void ExportJsonSkill()
-    {
-        string path = EditorUtility.SaveFilePanel("스킬 정보 저장", dataPath, "SKILL", "json");
-
-        if (string.IsNullOrEmpty(path)) return;
-
-        SkillWrapper skillWrapper = new SkillWrapper();
-        skillWrapper.skills = skillList;
-        string json = JsonUtility.ToJson(skillWrapper, true);
         Debug.Log(json);
 
         File.WriteAllText(path, json);
