@@ -1,11 +1,9 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using UnityEngine.Windows;
-using static UnityEditor.Progress;
+using Random = UnityEngine.Random;
 
 public class GachaMangaer : MonoBehaviour
 {
@@ -44,11 +42,16 @@ public class GachaMangaer : MonoBehaviour
     [SerializeField] private List<GachaCharacter> gacha_SSR_Pool;
     [SerializeField] private List<GachaCharacter> gacha_SR_Pool;
     [SerializeField] private List<GachaCharacter> gacha_R_Pool;
-    [SerializeField] private int srPity = 10;
-    [SerializeField] private int ssrHalfAdventageStartCut = 40; //확업 시작
-    [SerializeField] private int ssrHalfPity = 60; //ssr천장수치
-    [SerializeField] private bool isSSRFullPity = false; //픽업 천장인지
+    [SerializeField] private int srCeil = 10;
+    [SerializeField] private int ssrHalfAdventageStart = 40; //확업 시작
+    [SerializeField] private int ssrHalfCeil = 60; //ssr천장수치
     [SerializeField] private float ssrProbabilityIncrease = 1.5f;
+
+    private int currentSSRCount = 0; // 마지막 SSR 등장 이후 누적 뽑기 수
+    private int currentSRCount = 0; // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
+    private bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
+
+    private List<int> fullResult = new List<int>();
 
     /// <summary>
     /// 가챠 확률 계산
@@ -59,11 +62,6 @@ public class GachaMangaer : MonoBehaviour
         // 가챠 결과를 저장할 리스트입니다.
         List<int> results = new List<int>();
 
-        // 뽑기 상태는 해당 호출 내에서만 관리합니다.
-        int currentSSRCount = 0;   // 마지막 SSR 등장 이후 누적 뽑기 수
-        int currentSRCount = 0;    // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
-        bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
-
         for (int i = 0; i < _count; i++)
         {
             // 각 뽑기마다 pity 카운터 증가
@@ -71,14 +69,15 @@ public class GachaMangaer : MonoBehaviour
             currentSRCount++;
 
             // 강제 천장 조건
-            bool forcedSSR = (currentSSRCount >= 60);
-            bool forcedSR = (currentSRCount >= 10);
+            bool forcedSSR = (currentSSRCount >= ssrHalfCeil);
+            bool forcedSR = (currentSRCount >= srCeil);
 
             // 만약 두 천장이 동시에 발동하면 SR이 우선 적용됩니다.
             if (forcedSSR && forcedSR)
             {
-                int srResult = DrawSR(_container);
+                int srResult = GetSRResult(_container);
                 results.Add(srResult);
+                fullResult.Add(srResult);
                 currentSRCount = 0;  // SR pity는 초기화
                                      // SSR pity는 그대로 유지되어 다음 뽑기에 반영됩니다.
                 continue;
@@ -87,8 +86,9 @@ public class GachaMangaer : MonoBehaviour
             // SR 천장 우선 처리
             if (forcedSR)
             {
-                int srResult = DrawSR(_container);
+                int srResult = GetSRResult(_container);
                 results.Add(srResult);
+                fullResult.Add(srResult);
                 currentSRCount = 0;
                 continue;
             }
@@ -98,6 +98,7 @@ public class GachaMangaer : MonoBehaviour
             {
                 int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
                 results.Add(ssrResult);
+                fullResult.Add(ssrResult);
                 currentSSRCount = 0;
                 currentSRCount = 0;
                 continue;
@@ -105,9 +106,9 @@ public class GachaMangaer : MonoBehaviour
 
             // 일반 뽑기: 기본 SSR 확률에 40회 이상부터 추가 확률이 누적됩니다.
             float effectiveSSRChance = _container.Data.SSR_Percent;
-            if (currentSSRCount >= 40)
+            if (currentSSRCount >= ssrHalfAdventageStart)
             {
-                effectiveSSRChance += (currentSSRCount - 39) * 1.5f;
+                effectiveSSRChance += (currentSSRCount - 39) * ssrProbabilityIncrease;
             }
 
             // SSR 판정
@@ -116,26 +117,32 @@ public class GachaMangaer : MonoBehaviour
             {
                 int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
                 results.Add(ssrResult);
+                fullResult.Add(ssrResult);
                 currentSSRCount = 0;
                 currentSRCount = 0;
             }
             else
             {
                 // SSR 실패 시 SR 판정
-                float srRoll = UnityEngine.Random.Range(0f, 100f);
+                float srRoll = Random.Range(0f, 100f);
                 if (srRoll < _container.Data.SR_Percent)
                 {
-                    int srResult = DrawSR(_container);
+                    int srResult = GetSRResult(_container);
                     results.Add(srResult);
+                    fullResult.Add(srResult);
                     currentSRCount = 0;
                 }
                 else
                 {
                     // 나머지는 R 등급 처리 (여기서는 기본값 0 사용)
-                    results.Add(0);
+                    int rResult = GetRResult();
+                    results.Add(rResult);
+                    fullResult.Add(rResult);
                 }
             }
         }
+
+        Debug.Log(currentSSRCount);
 
         // 결과 출력 (디버그 로그)
         for (int i = 0; i < results.Count; i++)
@@ -145,9 +152,8 @@ public class GachaMangaer : MonoBehaviour
     }
 
     /// <summary>
-    /// SSR 결과를 결정합니다.
     /// forcePickupSSR 플래그가 활성화되어 있다면 무조건 픽업 SSR을 선택하며,
-    /// 그렇지 않을 경우 50% 확률로 픽업 SSR, 아닐 경우 다음 SSR은 무조건 픽업 SSR이 되도록 합니다.
+    /// 그렇지 않을 경우 50% 확률로 픽업 SSR, 아닐 경우 다음 SSR은 무조건 픽업 SSR이 되도록 함.
     /// </summary>
     private int GetSSRResult(ref bool forcePickupSSR, BannerContainer _container)
     {
@@ -159,7 +165,7 @@ public class GachaMangaer : MonoBehaviour
         }
         else
         {
-            float pickupRoll = UnityEngine.Random.Range(0f, 100f);
+            float pickupRoll = Random.Range(0f, 100f);
             if (pickupRoll < 50f)
             {
                 return PickFromList(_container.Data.SSR_PickupList, -1);
@@ -177,7 +183,7 @@ public class GachaMangaer : MonoBehaviour
     /// SR 결과를 결정합니다.
     /// SR 픽업 리스트가 있다면 무작위 선택, 없으면 기본값(-2) 반환.
     /// </summary>
-    private int DrawSR(BannerContainer _container)
+    private int GetSRResult(BannerContainer _container)
     {
         return PickFromList(_container.Data.SR_PickupList, -2);
     }
@@ -190,12 +196,18 @@ public class GachaMangaer : MonoBehaviour
     {
         if (list != null && list.Count > 0)
         {
-            int idx = UnityEngine.Random.Range(0, list.Count);
+            int idx = Random.Range(0, list.Count);
             return list[idx];
         }
         return defaultValue;
     }
 
+    private int GetRResult()
+    {
+        int idx = Random.Range(0, CharacterManager.GetRareCharacterCount(Rare.R));
+
+        return CharacterManager.GetCharactersFromRare(Rare.R)[idx];
+    }
 
     /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

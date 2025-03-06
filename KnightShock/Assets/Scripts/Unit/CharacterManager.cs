@@ -19,8 +19,9 @@ public static class CharacterManager
         foreach (var rarity in Enum.GetValues(typeof(Rare)).Cast<Rare>())
         {
             if (!rareCharacters.ContainsKey(rarity))
+            {
                 rareCharacters.Add(rarity, new List<int>());
-            Debug.Log(rarity.ToString());
+            }
         }
 
         if (File.Exists(characterPath))
@@ -44,8 +45,9 @@ public static class CharacterManager
                 Debug.Log("캐릭터 데이터 로드됨");
                 characters = wrapper.characters.ToHashSet();
             }
+            else
+                Debug.Log("캐릭터 json이 비어있음");
 
-            Debug.Log("캐릭터 json이 비어있음");
         }
     }
 
