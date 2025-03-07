@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,11 +19,13 @@ public class GachaUIController : MonoBehaviour
     [SerializeField] private Button one_roll;
     [SerializeField] private Button ten_roll;
 
-    private GachaMangaer gachaManager;
+    private GachaManager gachaManager;
+    private ResultManager resultManager;
 
     private void OnEnable()
     {
-        gachaManager = GachaMangaer.Instance;
+        gachaManager = GachaManager.Instance;
+        resultManager = ResultManager.Instance;
         ShowUI();
     }
 
@@ -111,12 +114,35 @@ public class GachaUIController : MonoBehaviour
 
         one_roll.onClick.AddListener(() => 
         {
-            GachaMangaer.Instance.StartGacha(_container);
+            SetResults(_container);
         });
 
         ten_roll.onClick.AddListener(() =>
         {
-            GachaMangaer.Instance.StartGacha(_container, 10);
+            SetResults(_container, 10);
         });
+    }
+
+    private void SetResults(BannerContainer _container, int _count = 1)
+    {
+        //가챠 실행 및 데이터 저장
+        List<int> result = gachaManager.StartGacha(_container, 10);
+        List<int> result_sorted = new List<int>(result);
+        result_sorted.Sort();
+
+        int count = result.Count;
+        if (result.Count == 10)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Character character = CharacterManager.GetCharacterFromID(result[i]);
+                Color singleColor = gachaManager.rarityColor[character.BaseRare];
+                resultManager.gachaTotal.SetCharacter(i, character, singleColor);
+            }
+        }
+
+        Color targetColor = gachaManager.rarityColor[CharacterManager.GetRareFromID(result_sorted[0])];
+
+        resultManager.gachaSplash.SetColor(targetColor);
     }
 }

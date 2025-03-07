@@ -4,25 +4,17 @@ using UnityEngine.UI;
 
 public class ResultManager : MonoBehaviour
 {
+    //resultManager는 하위 매니저를 관리하고 invoke되도록 하나의 함수로 과정을 묶어줌
     public static ResultManager Instance;
 
     [Header("결과창")]
-    [SerializeField] private GameObject gachaTotal;
-    [SerializeField] private GameObject gachaSingle;
-    [SerializeField] private GameObject splash;
+    public TotalManager gachaTotal { get; private set; }
+    public SingleManager gachaSingle { get; private set; }
+    public SplashManager gachaSplash { get; private set; }
 
     [Header("버튼")]
     [SerializeField] private Button skip;
     [SerializeField] private Button close;
-
-    [Header("결과 관리")]
-    [SerializeField] private GameObject characterGroup;
-    [SerializeField] private Dictionary<Rare, Color> frameColor;
-
-    private List<Image> characterImages; //캐릭터 이미지 변경
-    private Animator animator;
-    private List<Image> characterFrames; //등급에 맞춰 색상변경
-    private int hashSlide;
 
     private void Awake()
     {
@@ -35,34 +27,10 @@ public class ResultManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        animator = gachaTotal.gameObject.GetComponent<Animator>();
-        hashSlide = Animator.StringToHash("Slide");
-
-        foreach (Image obj in characterGroup.GetComponentsInChildren<Image>())
-        {
-            characterImages.Add(obj);
-        }
-
-        foreach (var image in characterImages)
-        {
-            characterFrames.Add(image.GetComponentInChildren<Image>());
-        }
-
-        frameColor = new Dictionary<Rare, Color>();
-        frameColor.Add(Rare.SSR, new Color(1f, 0.72f, 0f, 1f));
-        frameColor.Add(Rare.SR, new Color(0.8f, 0f, 1f, 1f));
-        frameColor.Add(Rare.R, new Color(0f, 0.75f, 1f, 1f));
     }
 
-    public void TriggerSlide()
+    public void ShowResult()
     {
-        animator.SetTrigger(hashSlide);
-    }
 
-    public void SetCharacter(int _index, int _id)
-    {
-        characterImages[_index].sprite = CharacterManager.GetCharacterFromID(_id).CharacterSprite;
-        characterFrames[_index].color = frameColor[CharacterManager.GetRareFromID(_id)];
     }
 }
