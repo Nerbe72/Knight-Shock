@@ -21,16 +21,16 @@ public class ResultManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         } else
         {
             Destroy(gameObject);
             return;
         }
+
+        gachaTotal = GetComponentInChildren<TotalManager>(true);
+        gachaSingle = GetComponentInChildren<SingleManager>(true);
+        gachaSplash = GetComponentInChildren<SplashManager>(true);
+
     }
 
-    public void ShowResult()
-    {
-
-    }
 }

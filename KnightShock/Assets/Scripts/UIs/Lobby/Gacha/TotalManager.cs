@@ -6,10 +6,10 @@ public class TotalManager : MonoBehaviour
 {
     [Header("결과 관리")]
     [SerializeField] private GameObject characterGroup;
+    [SerializeField] private List<Image> characterImages; //캐릭터 이미지 변경
+    [SerializeField] private List<Image> characterFrames; //등급에 맞춰 색상변경
 
-    private List<Image> characterImages; //캐릭터 이미지 변경
     private Animator totalAnimator;
-    private List<Image> characterFrames; //등급에 맞춰 색상변경
     private int hashSlide;
 
     private void Awake()
@@ -17,20 +17,12 @@ public class TotalManager : MonoBehaviour
         totalAnimator = GetComponent<Animator>();
         hashSlide = Animator.StringToHash("Slide");
 
-        InitDatas();
+        InitData();
     }
 
-    private void InitDatas()
+    private void InitData()
     {
-        foreach(Image obj in characterGroup.GetComponentsInChildren<Image>())
-        {
-            characterImages.Add(obj);
-        }
-
-        foreach (var image in characterImages)
-        {
-            characterFrames.Add(image.GetComponentInChildren<Image>());
-        }
+        characterGroup = GetComponentInChildren<HorizontalLayoutGroup>(true).gameObject;
     }
 
     public void TriggerSlide()
@@ -38,9 +30,21 @@ public class TotalManager : MonoBehaviour
         totalAnimator.SetTrigger(hashSlide);
     }
 
-    public void SetCharacter(int _index, Character _character, Color _color)
+    public void InitDatas(List<IReadOnlyCharacter> _characters, List<Color> _colors)
     {
-        characterImages[_index].sprite = _character.CharacterSprite;
-        characterFrames[_index].color = _color;
+        InitData();
+
+        int count = _characters.Count;
+        for (int i = 0; i < count; i++)
+        {
+            characterImages[i].sprite = _characters[i].characterSprite;
+            characterFrames[i].color = _colors[i];
+        }
+    }
+
+    public void StartTotal()
+    {
+        gameObject.SetActive(true);
+        TriggerSlide();
     }
 }

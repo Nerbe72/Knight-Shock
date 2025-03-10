@@ -73,11 +73,11 @@ public class CharacterTool : EditorWindow
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         bool deletionOccurred = false;
 
-        //리스트 정렬
+        // 리스트를 캐릭터ID 기준으로 정렬합니다.
         characterList.Sort((a, b) => a.Id.CompareTo(b.Id));
 
         int count = characterList.Count;
-        // 3개씩
+        // 3개씩 배치합니다.
         for (int i = 0; i < count; i += 3)
         {
             EditorGUILayout.BeginHorizontal();
@@ -106,7 +106,8 @@ public class CharacterTool : EditorWindow
                 else if ((int)(ch.Id / 10000) == 3)
                 {
                     ch.BaseRare = Rare.R;
-                } else
+                }
+                else
                 {
                     ch.BaseRare = Rare.R;
                 }
@@ -142,12 +143,11 @@ public class CharacterTool : EditorWindow
                 };
                 reorderActive.DoLayoutList();
 
-                // Sprite 처리
+                // 스탠딩 Sprite 처리
                 if (!string.IsNullOrEmpty(ch.SpritePath))
                 {
                     ch.CharacterSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SpritePath);
                 }
-
                 ch.CharacterSprite = (Sprite)EditorGUILayout.ObjectField("스탠딩", ch.CharacterSprite, typeof(Sprite), false);
                 if (ch.CharacterSprite != null)
                 {
@@ -178,7 +178,40 @@ public class CharacterTool : EditorWindow
 
                     GUI.DrawTextureWithTexCoords(drawingRect, ch.CharacterSprite.texture, normalizedRect, true);
                     ch.SpritePath = AssetDatabase.GetAssetPath(ch.CharacterSprite);
+                }
 
+                // 스플래시 Sprite 처리
+                if (!string.IsNullOrEmpty(ch.SplashPath))
+                {
+                    ch.SplashSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SplashPath);
+                }
+                ch.SplashSprite = (Sprite)EditorGUILayout.ObjectField("스플래시", ch.SplashSprite, typeof(Sprite), false);
+                if (ch.SplashSprite != null)
+                {
+                    int splashSize = 30;
+                    Rect splashRect = GUILayoutUtility.GetRect(splashSize * 9, splashSize * 8);
+                    float splashMaxWidth = splashRect.width;
+
+                    Rect splashSpriteRect = ch.SplashSprite.textureRect;
+                    float splashAspectRatio = splashSpriteRect.height / splashSpriteRect.width;
+                    float splashSpriteHeight = splashMaxWidth * splashAspectRatio;
+
+                    Rect splashDrawingRect = new Rect(
+                        splashRect.x,
+                        splashRect.y + splashRect.height - splashSpriteHeight,
+                        splashMaxWidth,
+                        splashSpriteHeight
+                    );
+
+                    Rect splashNormalizedRect = new Rect(
+                        splashSpriteRect.x / ch.SplashSprite.texture.width,
+                        splashSpriteRect.y / ch.SplashSprite.texture.height,
+                        splashSpriteRect.width / ch.SplashSprite.texture.width,
+                        splashSpriteRect.height / ch.SplashSprite.texture.height
+                    );
+
+                    GUI.DrawTextureWithTexCoords(splashDrawingRect, ch.SplashSprite.texture, splashNormalizedRect, true);
+                    ch.SplashPath = AssetDatabase.GetAssetPath(ch.SplashSprite);
                 }
 
                 // 삭제 버튼
@@ -203,13 +236,14 @@ public class CharacterTool : EditorWindow
 
             if (deletionOccurred)
             {
-                // 삭제 발생 시 루프 종료 후 재렌더링
+                // 삭제가 발생하면 루프 종료 후 재렌더링합니다.
                 break;
             }
             GUILayout.Space(5);
         }
         EditorGUILayout.EndScrollView();
     }
+
 
     private void ImportJson()
     {

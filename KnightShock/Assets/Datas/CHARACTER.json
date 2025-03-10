@@ -17,9 +17,13 @@
                 1001
             ],
             "CharacterSprite": {
-                "instanceID": 53304
+                "instanceID": 53334
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10001.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10001.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 10002,
@@ -38,9 +42,13 @@
                 1002
             ],
             "CharacterSprite": {
-                "instanceID": 53318
+                "instanceID": 53352
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10002.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10002.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 10003,
@@ -55,9 +63,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53308
+                "instanceID": 53342
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10003.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10003.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 20001,
@@ -72,9 +84,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53274
+                "instanceID": 53300
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20001.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20001.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 20002,
@@ -89,9 +105,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53322
+                "instanceID": 53356
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20002.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20002.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 20003,
@@ -106,9 +126,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53284
+                "instanceID": 53310
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20003.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20003.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 30001,
@@ -123,9 +147,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53280
+                "instanceID": 53306
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30001.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30001.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 30002,
@@ -140,9 +168,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53314
+                "instanceID": 53348
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30002.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STAND_30002.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 30003,
@@ -157,9 +189,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53296
+                "instanceID": 53322
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30003.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30003.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         },
         {
             "Id": 30004,
@@ -174,9 +210,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53300
+                "instanceID": 53326
             },
-            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30004.png"
+            "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30004.png",
+            "SplashSprite": {
+                "instanceID": 0
+            },
+            "SplashPath": ""
         }
     ]
 }

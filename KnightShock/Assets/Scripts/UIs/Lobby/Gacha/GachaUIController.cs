@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,7 +38,12 @@ public class GachaUIController : MonoBehaviour
             Destroy(ResultManager.Instance.gameObject);
             ResultManager.Instance = null;
         }
+
+        one_roll.onClick.RemoveAllListeners();
+        ten_roll.onClick.RemoveAllListeners();
     }
+
+
 
     public async void ShowUI()
     {
@@ -103,7 +110,7 @@ public class GachaUIController : MonoBehaviour
         int count = Math.Clamp(_container.Data.SSR_PickupList.Count, 0, 3);
         for (int i = 0; i < count; i++)
         {
-            characterIMG[i].sprite = CharacterManager.GetCharacterFromID(_container.Data.SSR_PickupList[i]).CharacterSprite;
+            characterIMG[i].sprite = CharacterManager.GetCharacterFromID(_container.Data.SSR_PickupList[i]).characterSprite;
             characterIMG[i].color = Color.white;
         }
 
@@ -112,37 +119,76 @@ public class GachaUIController : MonoBehaviour
             characterIMG[i].color = Color.clear;
         }
 
+        one_roll.onClick.RemoveAllListeners();
         one_roll.onClick.AddListener(() => 
         {
             SetResults(_container);
         });
 
+        ten_roll.onClick.RemoveAllListeners();
         ten_roll.onClick.AddListener(() =>
         {
             SetResults(_container, 10);
         });
     }
 
-    private void SetResults(BannerContainer _container, int _count = 1)
+    //결과값을 적용함
+    private async void SetResults(BannerContainer _container, int _count = 1)
     {
+        resultManager.gameObject.SetActive(true);
+
         //가챠 실행 및 데이터 저장
         List<int> result = gachaManager.StartGacha(_container, 10);
         List<int> result_sorted = new List<int>(result);
         result_sorted.Sort();
 
+        //splash
         int count = result.Count;
         if (result.Count == 10)
         {
             for (int i = 0; i < count; i++)
             {
-                Character character = CharacterManager.GetCharacterFromID(result[i]);
-                Color singleColor = gachaManager.rarityColor[character.BaseRare];
-                resultManager.gachaTotal.SetCharacter(i, character, singleColor);
+                IReadOnlyCharacter character = CharacterManager.GetCharacterFromID(result[i]);
+                Color singleColor = gachaManager.rarityColor[character.baseRare];
             }
         }
 
         Color targetColor = gachaManager.rarityColor[CharacterManager.GetRareFromID(result_sorted[0])];
 
         resultManager.gachaSplash.SetColor(targetColor);
+
+        resultManager.gachaSplash.StartSplash();
+
+        while (!resultManager.gachaSplash.FlagEnd)
+        {
+            await Task.Delay(100);
+        }
+
+        resultManager.gachaSplash.FlagEnd = false;
+
+        //single
+        List<IReadOnlyCharacter> characters = new List<IReadOnlyCharacter>();
+        List<Color> colors = new List<Color>();
+
+        foreach (var id in result)
+        {
+            IReadOnlyCharacter ch = CharacterManager.GetCharacterFromID(id);
+            characters.Add(ch);
+            colors.Add(gachaManager.rarityColor[ch.baseRare]);
+        }
+
+        resultManager.gachaSingle.InitData(characters, colors);
+        resultManager.gachaSingle.StartSingle();
+
+        while (!resultManager.gachaSingle.FlagEnd)
+        {
+            await Task.Delay(100);
+        }
+
+        resultManager.gachaSingle.FlagEnd = false;
+
+        //total
+        resultManager.gachaTotal.InitDatas(characters, colors);
+        resultManager.gachaTotal.StartTotal();
     }
 }

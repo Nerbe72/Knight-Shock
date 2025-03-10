@@ -51,7 +51,12 @@ public static class CharacterManager
         }
     }
 
-    public static Character GetCharacterFromID(int _id)
+    /// <summary>
+    /// 암시적 ReadOnly 캐스팅
+    /// </summary>
+    /// <param name="_id"></param>
+    /// <returns>수정 불가능한 데이터 반환</returns>
+    public static IReadOnlyCharacter GetCharacterFromID(int _id)
     {
         if (characters.TryGetValue(new Character(){ Id = _id }, out Character found))
         {
@@ -64,21 +69,30 @@ public static class CharacterManager
     public static Rare GetRareFromID(int _id)
     {
         int fid = Mathf.FloorToInt(_id / 10000);
-        if (!Enum.IsDefined(typeof(Rare), (Rare)_id)) return Rare.R;
-
+        if (!Enum.IsDefined(typeof(Rare), (Rare)fid)) return Rare.R;
         return (Rare)fid;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_rarity"></param>
+    /// <returns>레어등급에 맞는 캐릭터 id 리스트</returns>
     public static IReadOnlyList<int> GetCharactersFromRare(Rare _rarity)
     {
         return rareCharacters[_rarity].AsReadOnly();
     }
 
-    public static int GetRandomCharacter(Rare _rare, int _position)
+    public static int GetRandomRareCharacter(Rare _rare, int _position)
     {
         return rareCharacters[_rare][_position];
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_rare"></param>
+    /// <returns>레어등급에 맞는 캐릭터 Count</returns>
     public static int GetRareCharacterCount(Rare _rare)
     {
         return rareCharacters[_rare].Count;

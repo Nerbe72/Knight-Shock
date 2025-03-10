@@ -49,7 +49,7 @@ public class Title : MonoBehaviour
             blink.style.unityTextOutlineColor =
                 !reverse ? Color.Lerp(Color.black, Color.clear, time) : Color.Lerp(Color.clear, Color.black, time);
 
-            time += Time.deltaTime * 0.6f;
+            time += Time.deltaTime;
 
             if (time >= 1f)
             {

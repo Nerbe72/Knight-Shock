@@ -26,13 +26,26 @@ public class GachaManager : MonoBehaviour
         public float BaseProbability;
     }
 
+    [SerializeField] private int srCeil = 10;
+    [SerializeField] private int ssrHalfAdventageStart = 40; //확업 시작
+    [SerializeField] private int ssrHalfCeil = 60; //ssr천장수치
+    [SerializeField] private float ssrProbabilityIncrease = 1.5f;
+
+    private int currentSSRCount = 0; // 마지막 SSR 등장 이후 누적 뽑기 수
+    private int currentSRCount = 0; // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
+    private bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
+
+    private List<int> fullResult = new List<int>();
+
+
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-        } else
+        }
+        else
         {
             Destroy(gameObject);
             return;
@@ -44,23 +57,8 @@ public class GachaManager : MonoBehaviour
         rarityColor = new Dictionary<Rare, Color>();
         rarityColor.Add(Rare.SSR, new Color(1f, 0.72f, 0f, 1f));
         rarityColor.Add(Rare.SR, new Color(0.8f, 0f, 1f, 1f));
-        rarityColor.Add(Rare.R, new Color(0f, 0.75f, 1f, 1f));
+        rarityColor.Add(Rare.R, new Color(0f, 0.8f, 1f, 1f));
     }
-
-
-    [SerializeField] private List<GachaCharacter> gacha_SSR_Pool;
-    [SerializeField] private List<GachaCharacter> gacha_SR_Pool;
-    [SerializeField] private List<GachaCharacter> gacha_R_Pool;
-    [SerializeField] private int srCeil = 10;
-    [SerializeField] private int ssrHalfAdventageStart = 40; //확업 시작
-    [SerializeField] private int ssrHalfCeil = 60; //ssr천장수치
-    [SerializeField] private float ssrProbabilityIncrease = 1.5f;
-
-    private int currentSSRCount = 0; // 마지막 SSR 등장 이후 누적 뽑기 수
-    private int currentSRCount = 0; // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
-    private bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
-
-    private List<int> fullResult = new List<int>();
 
     /// <summary>
     /// 가챠 확률 계산
@@ -87,8 +85,8 @@ public class GachaManager : MonoBehaviour
                 int srResult = GetSRResult(_container);
                 results.Add(srResult);
                 fullResult.Add(srResult);
-                currentSRCount = 0;  // SR pity는 초기화
-                                     // SSR pity는 그대로 유지되어 다음 뽑기에 반영됩니다.
+                currentSRCount = 0;
+
                 continue;
             }
 
@@ -143,7 +141,7 @@ public class GachaManager : MonoBehaviour
                 }
                 else
                 {
-                    // 나머지는 R 등급 처리 (여기서는 기본값 0 사용)
+                    // 나머지는 R 등급 처리 (기본값 0)
                     int rResult = GetRResult();
                     results.Add(rResult);
                     fullResult.Add(rResult);
@@ -151,13 +149,12 @@ public class GachaManager : MonoBehaviour
             }
         }
 
-        Debug.Log(currentSSRCount);
-
         // 결과 출력 (디버그 로그)
         for (int i = 0; i < results.Count; i++)
         {
             Debug.Log(string.Format("뽑기 결과 {0}: {1}", i + 1, results[i]));
         }
+        Debug.Log("SSR 스택: " + currentSSRCount);
 
         return results;
     }
@@ -191,7 +188,7 @@ public class GachaManager : MonoBehaviour
     }
 
     /// <summary>
-    /// SR 결과를 결정합니다.
+    /// SR 결과 반환
     /// SR 픽업 리스트가 있다면 무작위 선택, 없으면 기본값(-2) 반환.
     /// </summary>
     private int GetSRResult(BannerContainer _container)
@@ -213,6 +210,10 @@ public class GachaManager : MonoBehaviour
         return defaultValue;
     }
 
+    /// <summary>
+    /// R 결과 반환
+    /// </summary>
+    /// <returns></returns>
     private int GetRResult()
     {
         int idx = Random.Range(0, CharacterManager.GetRareCharacterCount(Rare.R));
@@ -227,7 +228,6 @@ public class GachaManager : MonoBehaviour
     {
         BannerWrapper wrapper = await AuthManager.Instance.GetDataAsync<BannerWrapper>(Request.banners);
         bannerDatas = (wrapper).banners;
-        Debug.Log(bannerDatas.Count);
     }
 
     public async Task<Sprite> LoadSprite(string _path)

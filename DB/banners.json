@@ -18,7 +18,7 @@
       "bannerType": "None",
       "bannerName": "일상의 선율",
       "SSR_PickupList": [10003, 10001, 10002],
-      "SR_PickupList": [],
+      "SR_PickupList": [20001, 20002, 20003],
       "SSR_Percent": 1,
       "SR_Percent": 19,
       "SSR_PickupPercent": 0,
