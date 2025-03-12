@@ -10,7 +10,7 @@ using UnityEditor.U2D.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SingleManager : MonoBehaviour
+public class SingleManager : MonoBehaviour, IFlag
 {
     public bool FlagEnd { get; set; }
 
@@ -48,13 +48,12 @@ public class SingleManager : MonoBehaviour
     {
         if (characterIndex >= characters.Count)
         {
-            FlagEnd = true;
-            gameObject.SetActive(false);
+            CloseSingle();
             return;
         }
 
         animator.Rebind();
-        characterImage.sprite = characters[characterIndex].characterSprite;
+        characterImage.sprite = characters[characterIndex].splashSprite;
         characterName.text = characters[characterIndex].name;
         characterRare.text = characters[characterIndex].baseRare.ToString();
         characterRare.color = Color.clear;
@@ -81,9 +80,10 @@ public class SingleManager : MonoBehaviour
         MoveNext();
     }
 
-    public void SetFlag(bool _flag)
+    public void CloseSingle()
     {
-        FlagEnd = _flag;
+        FlagEnd = true;
+        gameObject.SetActive(false);
     }
 
     //애니메이션 이벤트

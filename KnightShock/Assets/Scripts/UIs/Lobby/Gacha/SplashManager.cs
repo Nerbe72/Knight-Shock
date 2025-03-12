@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SplashManager : MonoBehaviour
+public class SplashManager : MonoBehaviour, IFlag
 {
     public bool FlagEnd { get; set; }
 
@@ -57,13 +57,8 @@ public class SplashManager : MonoBehaviour
         gameObject.SetActive(true);
     }
 
-    public void SetFlag(bool _flag)
-    {
-        FlagEnd = _flag;
-    }
-
     //애니메이션 이벤트
-    private void EndSplash()
+    public void CloseSplash()
     {
         FlagEnd = true;
         gameObject.SetActive(false);

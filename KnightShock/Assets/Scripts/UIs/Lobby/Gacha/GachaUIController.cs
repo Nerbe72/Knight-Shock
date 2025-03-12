@@ -7,8 +7,10 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GachaUIController : MonoBehaviour
+public class GachaUIController : MonoBehaviour, IWindowController
 {
+    public GameObject Self { get; set; }
+
     [Header("배너 및 페이지")]
     [SerializeField] private ScrollRect gacha_scroll;
     [SerializeField] private GameObject content_prefab;
@@ -17,18 +19,25 @@ public class GachaUIController : MonoBehaviour
     [SerializeField] private TMP_Text bannerText;
     [SerializeField] private RectTransform characterPosition;
     [SerializeField] private List<Image> characterIMG;
+    [SerializeField] private Animator bannerAnimator;
 
+    [Header("버튼")]
     [SerializeField] private Button one_roll;
     [SerializeField] private Button ten_roll;
-
+    
     private GachaManager gachaManager;
     private ResultManager resultManager;
+
+    private void Awake()
+    {
+        Self = this.gameObject;
+    }
 
     private void OnEnable()
     {
         gachaManager = GachaManager.Instance;
         resultManager = ResultManager.Instance;
-        ShowUI();
+        Init();
     }
 
     private void OnDestroy()
@@ -43,11 +52,21 @@ public class GachaUIController : MonoBehaviour
         ten_roll.onClick.RemoveAllListeners();
     }
 
-
-
-    public async void ShowUI()
+    private void Update()
     {
-        InitUI();
+        if (Input.GetMouseButtonDown(0))
+        {
+            //스킵 표시
+            if (resultManager.gachaSplash.gameObject.activeSelf || resultManager.gachaSingle.gameObject.activeSelf)
+            {
+                resultManager.ShowSkip();
+            }
+        }
+    }
+
+    private async void Init()
+    {
+        ResetUI();
         await gachaManager.InitBannerDatas();
         SetUI();
 
@@ -55,7 +74,7 @@ public class GachaUIController : MonoBehaviour
         SelectContent(button_first.GetComponent<BannerContainer>());
     }
 
-    private void InitUI()
+    private void ResetUI()
     {
         int count = gacha_scroll.content.childCount;
         for (int i = 0; i < count; i++)
@@ -187,8 +206,25 @@ public class GachaUIController : MonoBehaviour
 
         resultManager.gachaSingle.FlagEnd = false;
 
+        if (_count == 1)
+        {
+            //가챠씬 종료
+            return;
+        }
+
         //total
         resultManager.gachaTotal.InitDatas(characters, colors);
         resultManager.gachaTotal.StartTotal();
+
+        while (!resultManager.gachaTotal.FlagEnd)
+        {
+            await Task.Delay(100);
+        }
+
+        resultManager.gachaTotal.FlagEnd = false;
+
+        resultManager.ShowClose();
+
+        return;
     }
 }

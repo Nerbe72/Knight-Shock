@@ -31,6 +31,48 @@ public class ResultManager : MonoBehaviour
         gachaSingle = GetComponentInChildren<SingleManager>(true);
         gachaSplash = GetComponentInChildren<SplashManager>(true);
 
+        skip.onClick.AddListener(PressSkip);
+        close.onClick.AddListener(PressClose);
     }
 
+    private void OnDestroy()
+    {
+        skip.onClick.RemoveAllListeners();
+        close.onClick.RemoveAllListeners();
+    }
+
+    private void PressSkip()
+    {
+        if (!gachaSplash.FlagEnd && gachaSplash.gameObject.activeSelf)
+        {
+            gachaSplash.CloseSplash();
+            return;
+        }
+        else if (!gachaSingle.FlagEnd && gachaSingle.gameObject.activeSelf)
+        {
+            gachaSingle.CloseSingle();
+            return;
+        }
+        else if (!gachaTotal.FlagEnd && gachaTotal.gameObject.activeSelf)
+        {
+            gachaTotal.CloseTotal();
+            return;
+        }
+    }
+
+    private void PressClose()
+    {
+        close.gameObject.SetActive(false);
+        gachaTotal.CloseTotal();
+    }
+
+    public void ShowSkip()
+    {
+        skip.gameObject.SetActive(true);
+    }
+
+    public void ShowClose()
+    {
+        close.gameObject.SetActive(true);
+    }
 }

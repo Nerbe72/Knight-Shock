@@ -189,7 +189,7 @@ public class CharacterTool : EditorWindow
                 if (ch.SplashSprite != null)
                 {
                     int splashSize = 30;
-                    Rect splashRect = GUILayoutUtility.GetRect(splashSize * 9, splashSize * 8);
+                    Rect splashRect = GUILayoutUtility.GetRect(splashSize * 9, splashSize * 6);
                     float splashMaxWidth = splashRect.width;
 
                     Rect splashSpriteRect = ch.SplashSprite.textureRect;

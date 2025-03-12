@@ -2,12 +2,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TotalManager : MonoBehaviour
+public class TotalManager : MonoBehaviour, IFlag
 {
+    public bool FlagEnd { get; set; }
+
     [Header("결과 관리")]
     [SerializeField] private GameObject characterGroup;
     [SerializeField] private List<Image> characterImages; //캐릭터 이미지 변경
     [SerializeField] private List<Image> characterFrames; //등급에 맞춰 색상변경
+
+    [Header("버튼")]
+    [SerializeField] private Button returnButton;
 
     private Animator totalAnimator;
     private int hashSlide;
@@ -46,5 +51,17 @@ public class TotalManager : MonoBehaviour
     {
         gameObject.SetActive(true);
         TriggerSlide();
+    }
+
+    public void CloseTotal()
+    {
+        FlagEnd = true;
+        gameObject.SetActive(false);
+    }
+
+    //애니메이션 호출
+    private void SetFlagTrue()
+    {
+        FlagEnd = true;
     }
 }

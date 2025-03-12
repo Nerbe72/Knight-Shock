@@ -37,6 +37,7 @@ public static class CharacterManager
                     if (!string.IsNullOrEmpty(ch.SpritePath))
                     {
                         ch.CharacterSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SpritePath);
+                        ch.SplashSprite = AssetDatabase.LoadAssetAtPath<Sprite>(ch.SplashPath);
                     }
 
                     rareCharacters[ch.BaseRare].Add(ch.Id);

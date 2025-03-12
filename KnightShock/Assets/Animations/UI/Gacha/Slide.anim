@@ -84,12 +84,12 @@ AnimationClip:
       - serializedVersion: 3
         time: 0
         value: 100
-        inSlope: -415.92908
-        outSlope: -415.92908
+        inSlope: -346.24365
+        outSlope: -346.24365
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.07149369
+        outWeight: 0.024751863
       - serializedVersion: 3
         time: 1
         value: -15
@@ -231,12 +231,12 @@ AnimationClip:
       - serializedVersion: 3
         time: 0
         value: 100
-        inSlope: -415.92908
-        outSlope: -415.92908
+        inSlope: -346.24365
+        outSlope: -346.24365
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.07149369
+        outWeight: 0.024751863
       - serializedVersion: 3
         time: 1
         value: -15
@@ -257,4 +257,11 @@ AnimationClip:
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
-  m_Events: []
+  m_Events:
+  - time: 0.98333335
+    functionName: SetFlagTrue
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0

@@ -17,13 +17,13 @@
                 1001
             ],
             "CharacterSprite": {
-                "instanceID": 53334
+                "instanceID": 53348
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10001.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53324
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_10001.png"
         },
         {
             "Id": 10002,
@@ -42,13 +42,13 @@
                 1002
             ],
             "CharacterSprite": {
-                "instanceID": 53352
+                "instanceID": 53370
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10002.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53356
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_10002.png"
         },
         {
             "Id": 10003,
@@ -63,13 +63,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53342
+                "instanceID": 53360
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_10003.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53928
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_10003.png"
         },
         {
             "Id": 20001,
@@ -84,7 +84,7 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53300
+                "instanceID": 53306
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20001.png",
             "SplashSprite": {
@@ -105,13 +105,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53356
+                "instanceID": 53374
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20002.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53922
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_20002.png"
         },
         {
             "Id": 20003,
@@ -126,13 +126,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53310
+                "instanceID": 53320
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_20003.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53310
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_20003.png"
         },
         {
             "Id": 30001,
@@ -147,7 +147,7 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53306
+                "instanceID": 53316
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STAND_30001.png",
             "SplashSprite": {
@@ -168,7 +168,7 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53348
+                "instanceID": 53366
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STAND_30002.png",
             "SplashSprite": {
@@ -189,7 +189,7 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53322
+                "instanceID": 53336
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30003.png",
             "SplashSprite": {
@@ -210,13 +210,13 @@
             "SkillId": [],
             "PassiveId": [],
             "CharacterSprite": {
-                "instanceID": 53326
+                "instanceID": 53340
             },
             "SpritePath": "Assets/Resources/CHARACTERS/STANDING_30004.png",
             "SplashSprite": {
-                "instanceID": 0
+                "instanceID": 53852
             },
-            "SplashPath": ""
+            "SplashPath": "Assets/Resources/SPLASHES/SPLASH_30004.png"
         }
     ]
 }
