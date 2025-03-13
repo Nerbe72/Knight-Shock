@@ -44,12 +44,14 @@ public static class SceneStackTracer
     public static IWindowController PeekScene()
     {
         IWindowController outWindow = null;
+
         if (sceneStack.TryPeek(out outWindow))
         {
             DebugStack();
-            isMain = false;
+            isMain = (outWindow.Self.name == "Lobby_Main");
             return outWindow;
         }
+
         DebugStack();
         isMain = true;
         return null;
@@ -57,9 +59,11 @@ public static class SceneStackTracer
 
     private static void DebugStack()
     {
+        int i = sceneStack.Count - 1;
         foreach (var scene in sceneStack)
         {
-            Debug.Log($"æ¿Ω∫≈√ <color=magenta>// {scene.Self.gameObject.name} //</color>");
+            Debug.Log($"æ¿Ω∫≈√ <color=magenta>{i}√˛// {scene.Self.gameObject.name} //</color>");
+            i--;
         }
         Debug.Log($"æ¿Ω∫≈√ <color=orange>////////////////////////////////////////////</color>");
     }

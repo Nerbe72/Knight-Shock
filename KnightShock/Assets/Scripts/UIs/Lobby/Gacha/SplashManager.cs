@@ -31,6 +31,7 @@ public class SplashManager : MonoBehaviour, IFlag
             }
         }
 
+        touchButton.onClick.RemoveAllListeners();
         touchButton.onClick.AddListener(RollEffect);
 
         FlagEnd = false;
@@ -53,6 +54,7 @@ public class SplashManager : MonoBehaviour, IFlag
 
     public void StartSplash()
     {
+        splashAnimator.Rebind();
         FlagEnd = false;
         gameObject.SetActive(true);
     }
