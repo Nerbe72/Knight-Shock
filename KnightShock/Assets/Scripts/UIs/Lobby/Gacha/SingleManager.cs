@@ -10,9 +10,11 @@ using UnityEditor.U2D.Animation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SingleManager : MonoBehaviour, IFlag
+public class SingleManager : MonoBehaviour, IFlag, IInitializable
 {
     public bool FlagEnd { get; set; }
+
+    public int InitializationPriority => 3;
 
     private List<IReadOnlyCharacter> characters;
     private List<Color> colors;
@@ -30,15 +32,6 @@ public class SingleManager : MonoBehaviour, IFlag
 
     private Color targetColor;
 
-    private void Awake()
-    {
-        animator = GetComponent<Animator>();
-        hashSingle = Animator.StringToHash("Single");
-        characterIndex = 0;
-
-        nextButton.onClick.AddListener(MoveNext);
-    }
-
     private void OnDestroy()
     {
         nextButton.onClick.RemoveAllListeners();
@@ -46,21 +39,32 @@ public class SingleManager : MonoBehaviour, IFlag
 
     private void MoveNext()
     {
+        //animator.Rebind();
+
         if (characterIndex >= characters.Count)
         {
             CloseSingle();
             return;
         }
 
-        animator.Rebind();
         characterImage.sprite = characters[characterIndex].splashSprite;
         characterName.text = characters[characterIndex].name;
         characterRare.text = characters[characterIndex].baseRare.ToString();
         characterRare.color = Color.clear;
         targetColor = colors[characterIndex];
-        animator.SetTrigger(hashSingle);
+        animator.Play(hashSingle, 0, 0);
+        //animator.SetTrigger(hashSingle);
 
         characterIndex += 1;
+    }
+
+    public void Initialize()
+    {
+        animator = GetComponent<Animator>();
+        hashSingle = Animator.StringToHash("Single");
+        characterIndex = 0;
+
+        nextButton.onClick.AddListener(MoveNext);
     }
 
     /// <summary>
@@ -115,4 +119,5 @@ public class SingleManager : MonoBehaviour, IFlag
 
         yield break;
     }
+
 }

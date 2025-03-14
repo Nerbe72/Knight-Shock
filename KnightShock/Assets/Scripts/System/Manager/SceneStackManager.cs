@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEditor.Rendering;
 using UnityEngine;
 
-public static class SceneStackTracer
+public static class SceneStackManager
 {
     public static bool isMain;
 

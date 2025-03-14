@@ -6,7 +6,7 @@ public interface IWindowController
 
     public void ShowWindow()
     {
-        SceneStackTracer.AddScene(this);
+        SceneStackManager.AddScene(this);
         Self.SetActive(true);
     }
 }

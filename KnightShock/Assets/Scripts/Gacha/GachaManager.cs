@@ -156,6 +156,8 @@ public class GachaManager : MonoBehaviour
         }
         Debug.Log("SSR 스택: " + currentSSRCount);
 
+        //결과 저장
+
         return results;
     }
 

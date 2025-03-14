@@ -7,9 +7,11 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GachaUIController : MonoBehaviour, IWindowController
+public class GachaUIController : MonoBehaviour, IWindowController, IInitializable
 {
     public GameObject Self { get; set; }
+
+    public int InitializationPriority => 5;
 
     [Header("배너 및 페이지")]
     [SerializeField] private ScrollRect gacha_scroll;
@@ -27,18 +29,6 @@ public class GachaUIController : MonoBehaviour, IWindowController
     
     private GachaManager gachaManager;
     private ResultManager resultManager;
-
-    private void Awake()
-    {
-        Self = this.gameObject;
-    }
-
-    private void OnEnable()
-    {
-        gachaManager = GachaManager.Instance;
-        resultManager = ResultManager.Instance;
-        Init();
-    }
 
     private void OnDestroy()
     {
@@ -226,5 +216,13 @@ public class GachaUIController : MonoBehaviour, IWindowController
         resultManager.ShowClose();
 
         return;
+    }
+
+    public void Initialize()
+    {
+        Self = this.gameObject;
+        gachaManager = GachaManager.Instance;
+        resultManager = ResultManager.Instance;
+        Init();
     }
 }

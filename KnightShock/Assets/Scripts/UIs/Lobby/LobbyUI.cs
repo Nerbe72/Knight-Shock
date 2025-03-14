@@ -24,8 +24,8 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject battleMapFrame;
     [SerializeField] private GameObject battleListFrame;
 
-    [Header("오브젝트 초기화 관리")]
-    [SerializeField] private List<GameObject> objects;
+    //[Header("오브젝트 초기화 관리")]
+    //[SerializeField] private List<GameObject> objects;
 
     [Header("창 관리")]
     [SerializeField] private GameObject buttons;
@@ -34,11 +34,11 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
-        foreach (var obj in objects)
-        {
-            obj.SetActive(true);
-            obj.SetActive(false);
-        }
+        //foreach (var obj in objects)
+        //{
+        //    obj.SetActive(true);
+        //    obj.SetActive(false);
+        //}
 
         InitUI();
         CharacterManager.LoadCharacters();
@@ -62,8 +62,8 @@ public class LobbyUI : MonoBehaviour
 
             if (characterFrame.gameObject.activeSelf || gachaFrame.gameObject.activeSelf)
             {
-                SceneStackTracer.PopScene();
-                if (SceneStackTracer.isMain)
+                SceneStackManager.PopScene();
+                if (SceneStackManager.isMain)
                 {
                     buttons.SetActive(false);
                 }
@@ -99,7 +99,7 @@ public class LobbyUI : MonoBehaviour
         backButton.onClick.AddListener(ClickBack);
         homeButton.onClick.AddListener(ClickHome);
 
-        SceneStackTracer.AddScene(mainFrame);
+        SceneStackManager.AddScene(mainFrame);
     }
 
     private void ClickGo()
@@ -111,30 +111,30 @@ public class LobbyUI : MonoBehaviour
     private void ClickCharacter()
     {
         ((IWindowController)characterFrame).ShowWindow();
-        buttons.SetActive(!SceneStackTracer.isMain);
+        buttons.SetActive(!SceneStackManager.isMain);
     }
 
     private void ClickGacha()
     {
         ((IWindowController)gachaFrame).ShowWindow();
-        buttons.SetActive(!SceneStackTracer.isMain);
+        buttons.SetActive(!SceneStackManager.isMain);
     }
 
     private void ClickSetting()
     {
         settingsFrame.gameObject.SetActive(true);
-        buttons.SetActive(!SceneStackTracer.isMain);
+        buttons.SetActive(!SceneStackManager.isMain);
     }
     
     private void ClickBack()
     {
-        SceneStackTracer.PopScene();
-        buttons.SetActive(!SceneStackTracer.isMain);
+        SceneStackManager.PopScene();
+        buttons.SetActive(!SceneStackManager.isMain);
     }
 
     private void ClickHome()
     {
-        SceneStackTracer.InitStack();
-        buttons.SetActive(!SceneStackTracer.isMain);
+        SceneStackManager.InitStack();
+        buttons.SetActive(!SceneStackManager.isMain);
     }
 }

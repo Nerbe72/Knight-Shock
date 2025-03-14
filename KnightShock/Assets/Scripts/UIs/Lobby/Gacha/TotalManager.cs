@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TotalManager : MonoBehaviour, IFlag
+public class TotalManager : MonoBehaviour, IFlag, IInitializable
 {
     public bool FlagEnd { get; set; }
+
+    public int InitializationPriority => 3;
 
     [Header("결과 관리")]
     [SerializeField] private GameObject characterGroup;
@@ -17,7 +19,12 @@ public class TotalManager : MonoBehaviour, IFlag
     private Animator totalAnimator;
     private int hashSlide;
 
-    private void Awake()
+    private void InitData()
+    {
+        characterGroup = GetComponentInChildren<HorizontalLayoutGroup>(true).gameObject;
+    }
+
+    public void Initialize()
     {
         totalAnimator = GetComponent<Animator>();
         hashSlide = Animator.StringToHash("Slide");
@@ -25,14 +32,10 @@ public class TotalManager : MonoBehaviour, IFlag
         InitData();
     }
 
-    private void InitData()
+    public void PlaySlide()
     {
-        characterGroup = GetComponentInChildren<HorizontalLayoutGroup>(true).gameObject;
-    }
-
-    public void TriggerSlide()
-    {
-        totalAnimator.SetTrigger(hashSlide);
+        totalAnimator.Play(hashSlide, 0, 0);
+        //totalAnimator.SetTrigger(hashSlide);
     }
 
     public void InitDatas(List<IReadOnlyCharacter> _characters, List<Color> _colors)
@@ -50,7 +53,7 @@ public class TotalManager : MonoBehaviour, IFlag
     public void StartTotal()
     {
         gameObject.SetActive(true);
-        TriggerSlide();
+        PlaySlide();
     }
 
     public void CloseTotal()

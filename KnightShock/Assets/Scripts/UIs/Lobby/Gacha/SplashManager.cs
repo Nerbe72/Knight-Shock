@@ -3,9 +3,11 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class SplashManager : MonoBehaviour, IFlag
+public class SplashManager : MonoBehaviour, IFlag, IInitializable
 {
     public bool FlagEnd { get; set; }
+
+    public int InitializationPriority => 2;
 
     private Animator splashAnimator;
     private int hashSplash;
@@ -18,7 +20,15 @@ public class SplashManager : MonoBehaviour, IFlag
     private float splashTime = 3.3f; //임시 지정
     private Color targetColor = Color.white;
 
-    private void Awake()
+    private (float width, float height) starSize;
+    private (float width, float height) shineSize;
+
+    private void OnDestroy()
+    {
+        touchButton.onClick.RemoveAllListeners();
+    }
+
+    public void Initialize()
     {
         splashAnimator = GetComponent<Animator>();
         hashSplash = Animator.StringToHash("Splash");
@@ -32,20 +42,11 @@ public class SplashManager : MonoBehaviour, IFlag
         }
 
         touchButton.onClick.RemoveAllListeners();
-        touchButton.onClick.AddListener(RollEffect);
+        touchButton.onClick.AddListener(TriggerRollEffect);
 
         FlagEnd = false;
     }
-
-    private void OnDestroy()
-    {
-        touchButton.onClick.RemoveAllListeners();
-    }
-
-    private void RollEffect()
-    {
-        splashAnimator.SetTrigger(hashSplash);
-    }
+    
 
     public void SetColor(Color _color)
     {
@@ -54,7 +55,6 @@ public class SplashManager : MonoBehaviour, IFlag
 
     public void StartSplash()
     {
-        splashAnimator.Rebind();
         FlagEnd = false;
         gameObject.SetActive(true);
     }
@@ -62,8 +62,18 @@ public class SplashManager : MonoBehaviour, IFlag
     //애니메이션 이벤트
     public void CloseSplash()
     {
+        RectTransform starRect = star.gameObject.GetComponent<RectTransform>();
+        starRect.localScale = Vector3.one;
+
+        RectTransform shineRect = shine.gameObject.GetComponent<RectTransform>();
+        starRect.localScale = Vector3.one;
         FlagEnd = true;
         gameObject.SetActive(false);
+    }
+
+    private void TriggerRollEffect()
+    {
+        splashAnimator.SetTrigger(hashSplash);
     }
 
     //애니메이션 이벤트
