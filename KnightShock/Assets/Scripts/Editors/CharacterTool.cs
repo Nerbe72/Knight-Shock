@@ -22,10 +22,10 @@ public class CharacterTool : EditorWindow
 
     private void OnGUI()
     {
-        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(1000)); // (1) 최외곽 Horizontal
+        EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(1000)); // (1) 최외곽
         EditorGUILayout.Space(10);
 
-        // 왼쪽 영역 (캐릭터)
+        // 캐릭터 영역
         CharacterSide();
 
         EditorGUILayout.Space(10);
@@ -53,7 +53,6 @@ public class CharacterTool : EditorWindow
         }
         EditorGUILayout.EndHorizontal(); // (3)
 
-        // 새 캐릭터 버튼
         if (GUILayout.Button("새 캐릭터"))
         {
             var newChar = new Character();
@@ -73,11 +72,11 @@ public class CharacterTool : EditorWindow
         scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
         bool deletionOccurred = false;
 
-        // 리스트를 캐릭터ID 기준으로 정렬합니다.
+        // 정렬
         characterList.Sort((a, b) => a.Id.CompareTo(b.Id));
 
+        // 3개 단위 배치
         int count = characterList.Count;
-        // 3개씩 배치합니다.
         for (int i = 0; i < count; i += 3)
         {
             EditorGUILayout.BeginHorizontal();
@@ -155,13 +154,12 @@ public class CharacterTool : EditorWindow
                     Rect previewRect = GUILayoutUtility.GetRect(size * 9, size * 18);
                     float maxWidth = previewRect.width;
 
+                    // 가로 비율에 맞춰 세로 길이를 조정
                     Rect spriteRect = ch.CharacterSprite.textureRect;
                     float aspectRatio = spriteRect.height / spriteRect.width;
-
-                    // 최대 가로 길이에 맞춰 스프라이트의 실제 높이를 계산합니다.
                     float spriteHeight = maxWidth * aspectRatio;
 
-                    // previewRect의 하단에 정렬되도록 drawingRect를 생성합니다.
+                    // preview 하단으로 정렬
                     Rect drawingRect = new Rect(
                         previewRect.x,
                         previewRect.y + previewRect.height - spriteHeight,
@@ -169,6 +167,7 @@ public class CharacterTool : EditorWindow
                         spriteHeight
                     );
 
+                    // 원본 텍스쳐 영역을 정규화. 0~1로
                     Rect normalizedRect = new Rect(
                         spriteRect.x / ch.CharacterSprite.texture.width,
                         spriteRect.y / ch.CharacterSprite.texture.height,
@@ -178,7 +177,30 @@ public class CharacterTool : EditorWindow
 
                     GUI.DrawTextureWithTexCoords(drawingRect, ch.CharacterSprite.texture, normalizedRect, true);
                     ch.SpritePath = AssetDatabase.GetAssetPath(ch.CharacterSprite);
+
+                    //마우스 입력
+                    Event evt = Event.current;
+                    if (evt.type == EventType.MouseDrag && drawingRect.Contains(evt.mousePosition))
+                    {
+                        Vector2 localPos = evt.mousePosition - drawingRect.position;
+                        Vector2 normalizedPos = new Vector2(localPos.x / drawingRect.width, 1 - (localPos.y / drawingRect.height));
+                        ch.SpritePivot = normalizedPos;
+
+                        evt.Use();
+                    }
+
+                    if (ch.SpritePivot != Vector2.zero)
+                    {
+                        Vector2 markSize = new Vector2(120, 240);
+                        Vector2 markPos = new Vector2(
+                            drawingRect.x + ch.SpritePivot.x * drawingRect.width - markSize.x * 0.5f,
+                            drawingRect.y + (1 - ch.SpritePivot.y) * drawingRect.height - markSize.y * 0.5f);
+                        Rect markRect = new Rect(markPos, markSize);
+                        Handles.DrawSolidRectangleWithOutline(markRect, Color.clear, Color.red);
+                    }
                 }
+
+                ch.SpritePivot = EditorGUILayout.Vector2Field("얼굴 위치", ch.SpritePivot);
 
                 // 스플래시 Sprite 처리
                 if (!string.IsNullOrEmpty(ch.SplashPath))

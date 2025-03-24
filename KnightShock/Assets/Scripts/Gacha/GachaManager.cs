@@ -9,8 +9,6 @@ public class GachaManager : MonoBehaviour
 {
     public static GachaManager Instance;
 
-    public Dictionary<Rare, Color> rarityColor { get; private set; }
-
     public List<BannerData> bannerDatas { get; private set; }
 
     public List<int> roll_history { get; private set; }
@@ -53,11 +51,6 @@ public class GachaManager : MonoBehaviour
 
         bannerDatas = new List<BannerData>();
         roll_history = new List<int>();
-
-        rarityColor = new Dictionary<Rare, Color>();
-        rarityColor.Add(Rare.SSR, new Color(1f, 0.72f, 0f, 1f));
-        rarityColor.Add(Rare.SR, new Color(0.8f, 0f, 1f, 1f));
-        rarityColor.Add(Rare.R, new Color(0f, 0.8f, 1f, 1f));
     }
 
     /// <summary>

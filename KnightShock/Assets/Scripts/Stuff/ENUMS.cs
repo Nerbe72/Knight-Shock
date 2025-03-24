@@ -62,6 +62,7 @@ public enum AttackArea
 public enum Request
 {
     characters,
+    user_,
     money,
     items,
     banners,
@@ -69,8 +70,30 @@ public enum Request
 
 public enum BannerType
 {
-    None,
+    None = 0,
     Beginner,
     Pickup,
     Limited,
+}
+
+public enum EquipmentPart
+{
+    Head = 0,
+    UpperBody,
+    LowerBody,
+    Hand,
+    Count
+}
+
+public enum Sorting
+{
+    Rarity,
+    Level,
+    Class
+}
+
+public enum SortingDirection
+{
+    Ascending,
+    Descending
 }

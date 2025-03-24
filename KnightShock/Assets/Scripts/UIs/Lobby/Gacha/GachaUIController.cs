@@ -158,11 +158,11 @@ public class GachaUIController : MonoBehaviour, IWindowController, IInitializabl
             for (int i = 0; i < count; i++)
             {
                 IReadOnlyCharacter character = CharacterManager.GetCharacterFromID(result[i]);
-                Color singleColor = gachaManager.rarityColor[character.baseRare];
+                Color singleColor = CharacterManager.rarityColor[character.baseRare];
             }
         }
 
-        Color targetColor = gachaManager.rarityColor[CharacterManager.GetRareFromID(result_sorted[0])];
+        Color targetColor = CharacterManager.rarityColor[CharacterManager.GetRareFromID(result_sorted[0])];
 
         resultManager.gachaSplash.SetColor(targetColor);
 
@@ -183,7 +183,7 @@ public class GachaUIController : MonoBehaviour, IWindowController, IInitializabl
         {
             IReadOnlyCharacter ch = CharacterManager.GetCharacterFromID(id);
             characters.Add(ch);
-            colors.Add(gachaManager.rarityColor[ch.baseRare]);
+            colors.Add(CharacterManager.rarityColor[ch.baseRare]);
         }
 
         resultManager.gachaSingle.InitData(characters, colors);

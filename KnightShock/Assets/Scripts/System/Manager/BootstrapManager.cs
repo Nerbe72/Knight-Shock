@@ -14,7 +14,6 @@ public class BootstrapManager : MonoBehaviour
         foreach (var init in sortedInitializables)
         {
             init.Initialize();
-            Debug.Log($"Initialized : {init.InitializationPriority}");
         }
     }
 }
