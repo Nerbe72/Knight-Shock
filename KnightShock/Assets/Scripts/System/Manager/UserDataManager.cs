@@ -36,6 +36,7 @@ public class UserDataManager : MonoBehaviour
             CharacterDataWrapper wrapper = await AuthManager.Instance.GetUserDataAsync<CharacterDataWrapper>($"user_{GameManager.Instance.UID}");
             characterDatas = wrapper.datas;
             trial++;
+            Debug.Log($"로드 시도 횟수: {trial}");
         }
         
         Debug.Log("보유 캐릭터 정보 로드됨");

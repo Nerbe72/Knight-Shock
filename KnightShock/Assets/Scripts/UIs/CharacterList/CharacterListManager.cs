@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public class CharacterListManager : MonoBehaviour
 {
@@ -26,7 +27,13 @@ public class CharacterListManager : MonoBehaviour
 
     public void SortingContents(Sorting _sorting)
     {
+        contents = sortingFunction[_sorting](contents);
 
+        int count = contents.Count;
+        for (int i = 0; i < count; i++)
+        {
+            contents[i].GetComponent<RectTransform>().SetSiblingIndex(i);
+        }
     }
 
     public bool IsAlreadyExist(int _id)

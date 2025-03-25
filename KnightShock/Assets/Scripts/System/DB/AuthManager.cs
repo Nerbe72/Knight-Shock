@@ -104,6 +104,9 @@ public class AuthManager : MonoBehaviour
             {
                 Debug.LogWarning("유저 데이터를 찾을 수 없어 새로 작성합니다.");
                 T newData = new T();
+
+                await SetUerDataAsync<T>(_fileName);
+
                 return newData;
             }
 
