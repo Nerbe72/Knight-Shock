@@ -36,7 +36,7 @@ public class CharacterListManager : MonoBehaviour
         }
     }
 
-    public bool IsAlreadyExist(int _id)
+    public bool IsExistInCharacterList(int _id)
     {
         foreach (var item in contents)
         {

@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const app = express();
 const port = 3000;
-const secretKey = 'mySecretKey'; // 실제 서비스에서는 환경변수를 이용
+const secretKey = 'testkey'; // 실제 서비스에서는 환경변수를 이용
 
 app.use(bodyParser.json());
 
@@ -158,7 +158,17 @@ app.post('/banners', verifyToken, (req, res) => {
     });
 });
 
+// 사용자 데이터 저장
+app.post('/user_', (req, res) => {
+    const jsonData = req.body;
+    const uid = jsonData.userId;
 
+    if (!userId) {
+
+    }
+
+    fs.writeFile('')
+})
 
 app.listen(port, () => {
   console.log(`서버가 포트 ${port}에서 실행 중입니다.`);

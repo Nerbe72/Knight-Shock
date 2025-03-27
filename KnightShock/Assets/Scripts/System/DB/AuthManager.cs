@@ -4,13 +4,14 @@ using System.Threading.Tasks;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
 using UnityEngine.Networking;
+using static System.Net.WebRequestMethods;
 
 public class AuthManager : MonoBehaviour
 {
     public static AuthManager Instance;
-
     private static string token;
 
+    public static string url = "http://localhost:3000/";
     private void Awake()
     {
         if (Instance == null)
@@ -32,9 +33,9 @@ public class AuthManager : MonoBehaviour
         Debug.LogWarning("<color=orange>토큰이 변경되었습니다</color>");
     }
 
-    public async Task<UnityWebRequest> SendAuthorizedRequest(string url)
+    public async Task<UnityWebRequest> SendAuthorizedRequest(string _url)
     {
-        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        UnityWebRequest request = new UnityWebRequest(_url, "POST");
 
         // 토큰이 있을 경우 Authorization 헤더에 추가
         if (!string.IsNullOrEmpty(token))
@@ -61,7 +62,7 @@ public class AuthManager : MonoBehaviour
     /// <returns></returns>
     public async Task<T> GetDataAsync<T>(Request _type)
     {
-        UnityWebRequest request = await SendAuthorizedRequest("http://localhost:3000/" + _type.ToString());
+        UnityWebRequest request = await SendAuthorizedRequest(url + _type.ToString());
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
         {
@@ -88,7 +89,7 @@ public class AuthManager : MonoBehaviour
     /// <returns></returns>
     public async Task<T> GetUserDataAsync<T>(string _fileName) where T : new ()
     {
-        UnityWebRequest request = await SendAuthorizedRequest("http://localhost:3000/" + _fileName);
+        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName);
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
         {
@@ -105,7 +106,7 @@ public class AuthManager : MonoBehaviour
                 Debug.LogWarning("유저 데이터를 찾을 수 없어 새로 작성합니다.");
                 T newData = new T();
 
-                await SetUerDataAsync<T>(_fileName);
+                await SetUserDataAsync<T>(_fileName, newData);
 
                 return newData;
             }
@@ -118,9 +119,26 @@ public class AuthManager : MonoBehaviour
         return data;
     }
 
-    public async Task<T> SetUerDataAsync<T>(string _fileName)
+    public async Task<T> SetUserDataAsync<T>(string _fileName, T _data)
     {
+        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName);
 
+        string jsondata = JsonUtility.ToJson(_data);
+        byte[] raw = System.Text.Encoding.UTF8.GetBytes(jsondata);
+        request.uploadHandler = new UploadHandlerRaw(raw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
+        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+        while (!operation.isDone)
+        {
+            await Task.Yield();
+        }
 
         return default;
     }
