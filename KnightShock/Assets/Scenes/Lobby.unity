@@ -1506,7 +1506,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &263573280
 Transform:
   m_ObjectHideFlags: 0
@@ -7864,9 +7864,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   srCeil: 10
-  ssrHalfAdventageStart: 40
-  ssrHalfCeil: 60
-  ssrProbabilityIncrease: 1.5
+  ssrAdventageStart: 50
+  ssrCeil: 70
+  ssrChanceIncrease: 1.5
 --- !u!4 &1276991994
 Transform:
   m_ObjectHideFlags: 0

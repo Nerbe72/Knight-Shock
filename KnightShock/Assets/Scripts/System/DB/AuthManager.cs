@@ -33,9 +33,9 @@ public class AuthManager : MonoBehaviour
         Debug.LogWarning("<color=orange>토큰이 변경되었습니다</color>");
     }
 
-    public async Task<UnityWebRequest> SendAuthorizedRequest(string _url)
+    public async Task<UnityWebRequest> SendAuthorizedRequest(string _url, string _getpost)
     {
-        UnityWebRequest request = new UnityWebRequest(_url, "POST");
+        UnityWebRequest request = new UnityWebRequest(_url, _getpost);
 
         // 토큰이 있을 경우 Authorization 헤더에 추가
         if (!string.IsNullOrEmpty(token))
@@ -62,7 +62,7 @@ public class AuthManager : MonoBehaviour
     /// <returns></returns>
     public async Task<T> GetDataAsync<T>(Request _type)
     {
-        UnityWebRequest request = await SendAuthorizedRequest(url + _type.ToString());
+        UnityWebRequest request = await SendAuthorizedRequest(url + _type.ToString(), "GET");
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
         {
@@ -81,6 +81,36 @@ public class AuthManager : MonoBehaviour
         return data;
     }
 
+    public async Task SetDataAsync<T>(Request _type, T _data)
+    {
+        string jsonData = JsonUtility.ToJson(_data);
+
+        UnityWebRequest request = new UnityWebRequest(url + _type.ToString(), "POST");
+        byte[] raw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(raw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        request.SetRequestHeader("Content-Type", "application/json");
+        if (!string.IsNullOrEmpty(token))
+        {
+            request.SetRequestHeader("Authorization", "Bearer " + token);
+        }
+
+        UnityWebRequestAsyncOperation operation = request.SendWebRequest();
+        while (!operation.isDone)
+        {
+            await Task.Yield();
+        }
+
+        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+        {
+            Debug.LogError("데이터 전송 오류: " + request.error);
+        } else
+        {
+            Debug.Log($"<color=green>{_type.ToString()} 완료</color>");
+        }
+    }
+
     /// <summary>
     /// 유저 데이터 관련 로드
     /// </summary>
@@ -89,7 +119,7 @@ public class AuthManager : MonoBehaviour
     /// <returns></returns>
     public async Task<T> GetUserDataAsync<T>(string _fileName) where T : new ()
     {
-        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName);
+        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName, "POST");
 
         if (request.result == UnityWebRequest.Result.ConnectionError)
         {
@@ -121,7 +151,7 @@ public class AuthManager : MonoBehaviour
 
     public async Task<T> SetUserDataAsync<T>(string _fileName, T _data)
     {
-        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName);
+        UnityWebRequest request = await SendAuthorizedRequest(url + _fileName, "POST");
 
         string jsondata = JsonUtility.ToJson(_data);
         byte[] raw = System.Text.Encoding.UTF8.GetBytes(jsondata);

@@ -52,15 +52,14 @@ public class CharacterListManager : MonoBehaviour
         {
             if (!contents[i].gameObject.activeSelf && contents[i].character.id == _id)
             {
-                contents[i].InitContent(CharacterManager.GetCharacterFromID(_id));
+                contents[i].InitContent(CharacterManager.GetCharacterFromID(_id), UserDataManager.Instance.GetCharacterData(_id));
                 return;
             }
         }
 
         CharacterLister lister = Instantiate(characterListPrefab);
-        lister.InitContent(CharacterManager.GetCharacterFromID(_id));
+        lister.InitContent(CharacterManager.GetCharacterFromID(_id), UserDataManager.Instance.GetCharacterData(_id));
         lister.transform.parent = scrollView.transform;
         contents.Add(lister);
     }
-
 }

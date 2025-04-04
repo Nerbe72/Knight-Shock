@@ -62,7 +62,10 @@ public enum AttackArea
 public enum Request
 {
     characters,
-    user_,
+    writeuserdata,
+    readuserdata,
+    writegachalog,
+    readgachalog,
     money,
     items,
     banners,

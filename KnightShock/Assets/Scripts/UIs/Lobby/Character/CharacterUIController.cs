@@ -19,7 +19,7 @@ public class CharacterUIController : MonoBehaviour, IWindowController, IInitiali
         listManager.InitList();
     }
 
-    private async void OnEnable()
+    private void OnEnable()
     {
         if (Self == null) return;
         

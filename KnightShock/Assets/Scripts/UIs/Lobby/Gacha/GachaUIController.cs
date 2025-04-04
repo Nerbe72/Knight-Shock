@@ -59,6 +59,7 @@ public class GachaUIController : MonoBehaviour, IWindowController, IInitializabl
         ResetUI();
         await gachaManager.InitBannerDatas();
         SetUI();
+        await gachaManager.InitCount();
 
         GameObject button_first = gacha_scroll.content.GetChild(0).gameObject;
         SelectContent(button_first.GetComponent<BannerContainer>());
@@ -77,16 +78,16 @@ public class GachaUIController : MonoBehaviour, IWindowController, IInitializabl
     {
         //데이터보다 스크롤 크기가 더 작으면 추가 생성
         int scrollCount = gacha_scroll.content.childCount;
-        int bannerCount = gachaManager.bannerDatas.Count;
+        int bannerCount = gachaManager.BannerDatas.Count;
 
         for (int i = 0; i < scrollCount; i++)
         {
-            AddContent(gachaManager.bannerDatas[i], i);
+            AddContent(gachaManager.BannerDatas[i], i);
         }
 
         for (int i = scrollCount; i < bannerCount; i++)
         {
-            AddContent(gachaManager.bannerDatas[i]);
+            AddContent(gachaManager.BannerDatas[i]);
         }
     }
 

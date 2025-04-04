@@ -21,9 +21,10 @@ public class CharacterLister : MonoBehaviour
         button.onClick.RemoveAllListeners();
     }
 
-    public void InitContent(IReadOnlyCharacter _character)
+    public void InitContent(IReadOnlyCharacter _character, IReadOnlyCharacterData _data)
     {
         character = _character;
+        data = _data;
         characterImage.sprite = _character.characterSprite;
         characterImage.rectTransform.pivot = _character.spritePivot;
         characterImage.rectTransform.anchoredPosition = Vector2.zero;

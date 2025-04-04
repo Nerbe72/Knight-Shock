@@ -42,6 +42,18 @@ public class UserDataManager : MonoBehaviour
         Debug.Log("보유 캐릭터 정보 로드됨");
     }
 
+    public void SetCharacterHeld(IReadOnlyCharacter _character)
+    {
+        if (IsExistInHeld(_character.id))
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// 변경사항 저장
+    /// </summary>
+    /// <returns></returns>
     public async Task SaveCharacterData()
     {
 
@@ -111,5 +123,10 @@ public class UserDataManager : MonoBehaviour
     private void SetLastUpdateTime(int _id)
     {
         characterDatas[_id].LastUpdated = $"{DateTime.Now.Year}-{DateTime.Now.Month}-{DateTime.Now.Day} {DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
+    }
+
+    private bool IsExistInHeld(int _id)
+    {
+        return characterDatas.ContainsKey(_id);
     }
 }

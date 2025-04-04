@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Random = UnityEngine.Random;
@@ -9,33 +11,19 @@ public class GachaManager : MonoBehaviour
 {
     public static GachaManager Instance;
 
-    public List<BannerData> bannerDatas { get; private set; }
+    public List<BannerData> BannerDatas { get; private set; }
 
-    public List<int> roll_history { get; private set; }
-    public List<int> roll_result { get; private set; }
-
-
-    [Serializable]
-    public class GachaCharacter
-    {
-        public string Name;
-        public Rare Rarity;
-        public bool IsPickup;
-        public float BaseProbability;
-    }
+    public List<int> RollHistory { get; private set; }
 
     [SerializeField] private int srCeil = 10;
-    [SerializeField] private int ssrHalfAdventageStart = 40; //확업 시작
-    [SerializeField] private int ssrHalfCeil = 60; //ssr천장수치
-    [SerializeField] private float ssrProbabilityIncrease = 1.5f;
+    [SerializeField] private int ssrAdventageStart = 50; //확업 시작
+    [SerializeField] private int ssrCeil = 70; //ssr천장수치
+    [SerializeField] private float ssrChanceIncrease = 1.5f;
 
+    private int totalCount = 0;
     private int currentSSRCount = 0; // 마지막 SSR 등장 이후 누적 뽑기 수
     private int currentSRCount = 0; // 마지막 SR 또는 SSR 등장 이후 누적 뽑기 수
-    private bool forcePickupSSR = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
-
-    private List<int> fullResult = new List<int>();
-
-
+    private bool pickupForce = false;  // 이전 SSR이 픽업이 아니었을 경우 다음 SSR은 무조건 픽업 처리
     private void Awake()
     {
         if (Instance == null)
@@ -49,8 +37,8 @@ public class GachaManager : MonoBehaviour
             return;
         }
 
-        bannerDatas = new List<BannerData>();
-        roll_history = new List<int>();
+        BannerDatas = new List<BannerData>();
+        RollHistory = new List<int>();
     }
 
     /// <summary>
@@ -59,67 +47,59 @@ public class GachaManager : MonoBehaviour
     /// <returns>결과(캐릭터id) 반환</returns>
     public List<int> StartGacha(BannerContainer _container, int _count = 1)
     {
-        // 가챠 결과를 저장할 리스트입니다.
         List<int> results = new List<int>();
+        List<GachaResult> logs = new List<GachaResult>();
 
         for (int i = 0; i < _count; i++)
         {
+            //todo: 시간추가
+            string currentTime = "";
             // 각 뽑기마다 pity 카운터 증가
+            totalCount++;
             currentSSRCount++;
             currentSRCount++;
 
             // 강제 천장 조건
-            bool forcedSSR = (currentSSRCount >= ssrHalfCeil);
+            bool forcedSSR = (currentSSRCount >= ssrCeil);
             bool forcedSR = (currentSRCount >= srCeil);
 
-            // 만약 두 천장이 동시에 발동하면 SR이 우선 적용됩니다.
-            if (forcedSSR && forcedSR)
-            {
-                int srResult = GetSRResult(_container);
-                results.Add(srResult);
-                fullResult.Add(srResult);
-                currentSRCount = 0;
-
-                continue;
-            }
-
-            // SR 천장 우선 처리
+            // SR확정 우선 적용
             if (forcedSR)
             {
                 int srResult = GetSRResult(_container);
                 results.Add(srResult);
-                fullResult.Add(srResult);
                 currentSRCount = 0;
+                logs.Add(new GachaResult(srResult, totalCount, currentSRCount, currentSSRCount, pickupForce, currentTime));
                 continue;
             }
 
-            // SSR 천장 처리
+            // SSR 확정 적용
             if (forcedSSR)
             {
-                int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
+                int ssrResult = GetSSRResult(ref pickupForce, _container);
                 results.Add(ssrResult);
-                fullResult.Add(ssrResult);
                 currentSSRCount = 0;
                 currentSRCount = 0;
+                logs.Add(new GachaResult(ssrResult, totalCount, currentSRCount, currentSSRCount, pickupForce, currentTime));
                 continue;
             }
 
-            // 일반 뽑기: 기본 SSR 확률에 40회 이상부터 추가 확률이 누적됩니다.
-            float effectiveSSRChance = _container.Data.SSR_Percent;
-            if (currentSSRCount >= ssrHalfAdventageStart)
+            // ssr확률 증가 계산
+            float SSRChance = _container.Data.SSR_Percent;
+            if (currentSSRCount >= ssrAdventageStart)
             {
-                effectiveSSRChance += (currentSSRCount - 39) * ssrProbabilityIncrease;
+                SSRChance += (currentSSRCount - ssrAdventageStart - 1) * ssrChanceIncrease;
             }
 
             // SSR 판정
-            float roll = UnityEngine.Random.Range(0f, 100f);
-            if (roll < effectiveSSRChance)
+            float roll = Random.Range(0f, 100f);
+            if (roll < SSRChance)
             {
-                int ssrResult = GetSSRResult(ref forcePickupSSR, _container);
+                int ssrResult = GetSSRResult(ref pickupForce, _container);
                 results.Add(ssrResult);
-                fullResult.Add(ssrResult);
                 currentSSRCount = 0;
                 currentSRCount = 0;
+                logs.Add(new GachaResult(ssrResult, totalCount, currentSRCount, currentSSRCount, pickupForce, currentTime));
             }
             else
             {
@@ -129,15 +109,15 @@ public class GachaManager : MonoBehaviour
                 {
                     int srResult = GetSRResult(_container);
                     results.Add(srResult);
-                    fullResult.Add(srResult);
                     currentSRCount = 0;
+                    logs.Add(new GachaResult(srResult, totalCount, currentSRCount, currentSSRCount, pickupForce, currentTime));
                 }
                 else
                 {
                     // 나머지는 R 등급 처리 (기본값 0)
                     int rResult = GetRResult();
                     results.Add(rResult);
-                    fullResult.Add(rResult);
+                    logs.Add(new GachaResult(rResult, totalCount, currentSRCount, currentSSRCount, pickupForce, currentTime));
                 }
             }
         }
@@ -150,20 +130,27 @@ public class GachaManager : MonoBehaviour
         Debug.Log("SSR 스택: " + currentSSRCount);
 
         //결과 저장
+        Task task = AuthManager.Instance.SetDataAsync(Request.writegachalog, new GachaResultWrapper(logs));
+        task.ContinueWith(task =>
+        {
+            Debug.LogWarning("가챠정보 저장 실패, 1회 재시도합니다.");
+        }, TaskContinuationOptions.OnlyOnFaulted);
+
+        //결과 플레이어캐릭터 정보로 전달 보유목록 업데이트
 
         return results;
     }
 
     /// <summary>
-    /// forcePickupSSR 플래그가 활성화되어 있다면 무조건 픽업 SSR을 선택하며,
-    /// 그렇지 않을 경우 50% 확률로 픽업 SSR, 아닐 경우 다음 SSR은 무조건 픽업 SSR이 되도록 함.
+    /// _pickupForce 플래그가 활성화되어 있다면 무조건 픽업 SSR을 선택,
+    /// or 50% 확률로 픽업 SSR, 아닐 경우 다음 SSR은 무조건 픽업 SSR이 되도록 플래그 설정
     /// </summary>
-    private int GetSSRResult(ref bool forcePickupSSR, BannerContainer _container)
+    private int GetSSRResult(ref bool _pickupForce, BannerContainer _container)
     {
-        if (forcePickupSSR)
+        if (_pickupForce)
         {
             int result = PickFromList(_container.Data.SSR_PickupList, -1);
-            forcePickupSSR = false;
+            _pickupForce = false;
             return result;
         }
         else
@@ -176,8 +163,8 @@ public class GachaManager : MonoBehaviour
             else
             {
                 // 픽업이 아닌 경우 다음 SSR은 무조건 픽업 SSR이 되도록 플래그 설정
-                forcePickupSSR = true;
-                return PickFromList(_container.Data.SSR_PickupList, -1);
+                _pickupForce = true;
+                return PickFromList(CharacterManager.GetCharactersFromRare(Rare.SSR), -1);
             }
         }
     }
@@ -192,10 +179,9 @@ public class GachaManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 주어진 리스트에서 무작위로 아이템을 선택합니다.
-    /// 리스트가 비어있을 경우 defaultValue를 반환합니다.
+    /// 픽업 선택
     /// </summary>
-    private int PickFromList(List<int> list, int defaultValue)
+    private int PickFromList(IReadOnlyList<int> list, int defaultValue)
     {
         if (list != null && list.Count > 0)
         {
@@ -208,7 +194,6 @@ public class GachaManager : MonoBehaviour
     /// <summary>
     /// R 결과 반환
     /// </summary>
-    /// <returns></returns>
     private int GetRResult()
     {
         int idx = Random.Range(0, CharacterManager.GetRareCharacterCount(Rare.R));
@@ -216,13 +201,25 @@ public class GachaManager : MonoBehaviour
         return CharacterManager.GetCharactersFromRare(Rare.R)[idx];
     }
 
-    /// ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     public async Task InitBannerDatas()
     {
         BannerWrapper wrapper = await AuthManager.Instance.GetDataAsync<BannerWrapper>(Request.banners);
-        bannerDatas = (wrapper).banners;
+        BannerDatas = (wrapper).banners;
+    }
+
+    public async Task InitCount()
+    {
+        //db로 부터 결과값을 가져옴
+        GachaResultWrapper result = await AuthManager.Instance.GetDataAsync<GachaResultWrapper>(Request.writegachalog);
+        GachaResult latest = result.GachaResultList[result.GachaResultList.Count - 1];
+        totalCount = latest.TotalCount;
+        currentSRCount = latest.SRCurrentCount;
+        currentSSRCount = latest.SSRCurrentCount;
+        pickupForce = latest.PickupForce;
+        Debug.Log($"로드된 최종 결과\ntotal:{totalCount}, sr:{currentSRCount}, ssr:{currentSSRCount}, pickupForce:{pickupForce}");
     }
 
     public async Task<Sprite> LoadSprite(string _path)

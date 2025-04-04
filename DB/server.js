@@ -60,6 +60,30 @@ function verifyToken(req, res, next) {
 }
 
 
+// 사용자 데이터
+//app.post('/writeuserdata', verifyToken, (req, res) => {
+//    const jsonData = req.body;
+//    const uid = jsonData.userId;
+
+//    if (!uid) {
+//        jsonData.
+//    }
+
+//    fs.appendFile()
+//});
+
+app.post('/readuserdata', verifyToken, (req, res) => {
+    const jsonData = req.body;
+    const uid = jsonData.userId;
+
+    if (!uid) {
+
+    }
+
+    fs.writeFile('')
+});
+
+
 // 캐릭터 소지 목록 반환 API (보호된 엔드포인트, POST 요청)
 app.post('/characters', verifyToken, (req, res) => {
   fs.readFile('./characters.json', 'utf8', (err, data) => {
@@ -89,7 +113,7 @@ app.post('/characters', verifyToken, (req, res) => {
 
 
 // 캐릭터 정보 수정 및 업데이트 API (보호된 엔드포인트, POST 요청)
-app.post('/updateCharacters', verifyToken, (req, res) => {
+app.post('/updateheld', verifyToken, (req, res) => {
   // 클라이언트에서 수정된 캐릭터 배열을 전달 (예: [{ name: "전사", possessed: true }, ...])
   const newCharacters = req.body.characters;
   
@@ -139,8 +163,74 @@ app.post('/updateCharacters', verifyToken, (req, res) => {
 });
 
 // 현재 시행중인 가챠 배너 제공
-app.post('/banners', verifyToken, (req, res) => {
+app.get('/banners', verifyToken, (req, res) => {
     fs.readFile('./banners.json', 'utf8', (err, data) => {
+        if (err) {
+            console.log("배너 서버 에러");
+            return res.status(500).json({ message: '서버 에러' });
+        }
+
+        let bannersData;
+        try {
+            bannersData = JSON.parse(data).banners;
+        } catch (e) {
+            console.log("배너 파싱 에러");
+            return res.status(500).json({ message: '데이터 파싱 에러' });
+        }
+
+        return res.json({
+            banners: bannersData
+        });
+    });
+});
+
+
+// 가챠 진행 정보 로그 저장
+app.post('/writegachalog', verifyToken, (req, res) => {
+    const wrapper = req.body;
+
+    if (!wrapper || !Array.isArray(wrapper.GachaResultList)) {
+        console.log("유효하지 않은 데이터 형식이 들어옴(가챠로그)");
+        return res.status(400).json({ message: '유효하지 않은 데이터 형식' });
+    }
+
+    let ndjson = "";
+    wrapper.GachaResultList.forEach(result => {
+        ndjson += JSON.stringify(result) + '\n';
+    });
+
+    const fileName = './gachalog_' + req.userId + '.json';
+
+    //fs.access(fileName, fs.constants.F_OK, (accessErr) => {
+    //    if (accessErr) {
+    //        fs.writeFile(fileName, '', (writeErr) => {
+    //            if (writeErr) {
+    //                console.error('파일 생성 실패', writeErr);
+    //                return res.status(500).json({ message: '새 파일 작성 실패' });
+    //            }
+    //        });
+    //    }
+
+    //    fs.appendFile(fileName, ndjson, (appendErr) => {
+    //        if (appendErr) {
+    //            console.error('로그 붙이기 실패', appendErr);
+    //            return res.status(500).json({ message: '로그 붙이기 실패' });
+    //        }
+    //        res.json({ message: '로그 저장 완료' });
+    //    });
+    //}
+
+    fs.appendFile(fileName, ndjson, (appendErr) => {
+        if (appendErr) {
+            console.error('로그 붙이기 실패', appendErr);
+            return res.status(500).json({ message: '로그 붙이기 실패' });
+        }
+        res.json({ message: '로그 저장 완료' });
+    });
+});
+
+app.get('/readgachalog', verifyToken, (req, res) => {
+    fs.readFile('./gachalog_' + req.userId + '.json', 'utf8', (err, data) => {
         if (err) {
             return res.status(500).json({ message: '서버 에러' });
         }
@@ -157,18 +247,6 @@ app.post('/banners', verifyToken, (req, res) => {
         });
     });
 });
-
-// 사용자 데이터 저장
-app.post('/user_', (req, res) => {
-    const jsonData = req.body;
-    const uid = jsonData.userId;
-
-    if (!userId) {
-
-    }
-
-    fs.writeFile('')
-})
 
 app.listen(port, () => {
   console.log(`서버가 포트 ${port}에서 실행 중입니다.`);
